@@ -6,6 +6,7 @@ Created on Mon Feb  2 16:22:22 2015
 """
 
 import random
+import outils
 from soccersimulator import pyglet
 from soccersimulator import Vector2D
 from soccersimulator import SoccerAction
@@ -16,51 +17,32 @@ from soccersimulator import SoccerPlayer
 from soccersimulator import SoccerBattle,PygletObserver,ConsoleListener,LogListener
 
 '''
-Stratégie Vide
-Le joueur ne fait rien
-'''
-
-class VideS(SoccerStrategy):
-    def __init__(self):
-        pass
-    def start_battle(self,state):
-        pass
-    def finish_battle(self,won):
-        pass
-    def compute_strategy(self,state,player,teamid):
-        return SoccerAction()
-    def copy(self):
-        return VideS()
-    def create_strategy(self):
-        return VideS()
-
-'''
 Stratégie de mouvement
-Le joueur se déplacera vers le point indiqué
+Se déplace vers un point indiqué
 '''
-
-class AllerVersBallon(SoccerStrategy):
-    def __init__(self):
+class AllerVersLoc(SoccerStrategy):
+    def __init__(self, localisation):
+        self.loc = localisation        
         pass
     def start_battle(self,state):
         pass
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        mouvement = state.ball.position - player.position
-        return SoccerAction(vitesse)
+        mouvement = loc - player.position
+        return SoccerAction(mouvement)
     def copy(self):
-        return AllerVersBallon()
+        return AllerVersLoc()
     def create_strategy(self):
-        return AllerVersBallon()
-        
+        return AllerVersLoc()
+
         
 '''Fenêtre de test de partie'''
 
 team1=SoccerTeam("team1")
 team2=SoccerTeam("team2")
-team1.add_player(SoccerPlayer("t1j1",AllerVersBallon()))
-team2.add_player(SoccerPlayer("t2j1",VideS()))
+team1.add_player(SoccerPlayer("t1j1",AllerVersLoc(Vector2D(0,0))))
+team2.add_player(SoccerPlayer("t2j1",AllerVersLoc(Vector2D(5,20))))
 battle=SoccerBattle(team1,team2)
 obs=PygletObserver()
 obs.set_soccer_battle(battle)

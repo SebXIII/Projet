@@ -1,29 +1,7 @@
-#Importation
-import random
-from soccersimulator import pyglet
-from soccersimulator import Vector2D
-from soccersimulator import SoccerAction
-from soccersimulator import SoccerBall
-from soccersimulator import SoccerStrategy
-from soccersimulator import SoccerTeam
-from soccersimulator import SoccerPlayer
-from soccersimulator import SoccerBattle,PygletObserver,ConsoleListener,LogListener
+from soccersimulator import Vector2D, SoccerBattle, SoccerPlayer, SoccerTeam, SoccerAction, SoccerStrategy
+from soccersimulator import PygletObserver,ConsoleListener,LogListener
+from soccersimulator import PLAYER_RADIUS, BALL_RADIUS
 
-
-#Test avec Vec et autre
-'''vec = Vector2D(1,1)
-vec2 = Vector2D(2,0)
-vec3 = vec + vec2
-vec3.norm
-vecrand = Vector2D()
-vecrand.random(-1,1)
-vecrand.norm
-vec3 = Vector2D(2000,3)
-vec3.normalize
-vec3
-act = SoccerAction(vecrand,vec)
-laboule = SoccerBall(vecrand, vec)
-laboule.angle'''
 
 #Création de la random stratégie
 class RandomStrategy(SoccerStrategy):
@@ -171,15 +149,6 @@ class GoalFixeStrategy(SoccerStrategy):
             return 2
         else:
             return 1
-        
-#lancement partie
-team1=SoccerTeam("team1")
-team2=SoccerTeam("team2")
-team1.add_player(SoccerPlayer("t1j1",ZigStrategy()))
-team2.add_player(SoccerPlayer("t2j1",FonceurStrategy()))
-team1.add_player(SoccerPlayer("t1j2",GoalFixeStrategy()))
-team2.add_player(SoccerPlayer("t2j2",GoalFixeStrategy()))
-battle=SoccerBattle(team1,team2)
-obs=PygletObserver()
-obs.set_soccer_battle(battle)
-pyglet.app.run()
+
+
+

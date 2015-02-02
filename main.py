@@ -10,11 +10,11 @@ from soccersimulator import pyglet
 from soccersimulator import PygletObserver
 from soccersimulator import SoccerBattle
 from monequipe import teams
-from strats import AllerVersBallon, Tir, VideS
+from strats import AllerVersBallon, Tir, VideS, AllerVersLoc, CompoStrat, Fonceur, AllerButBallon, Degagement, Defenseur
 
 
-team1=teams[0]
-team2 = teams[0]
+team1=teams[1]
+team2 = teams[1]
 '''
 if len(teams)>1:
     team2=teams[1]
@@ -25,7 +25,4 @@ battle=SoccerBattle(team1,team2)
 obs=PygletObserver()
 obs.set_soccer_battle(battle)
 pyglet.app.run()
-
-
-
 

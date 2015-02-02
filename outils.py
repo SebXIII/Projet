@@ -7,7 +7,7 @@ Created on Mon Feb  2 16:47:36 2015
 
 def IDTeamOp(id):
     if (id == 1):
-        return 0
+        return 2
     else:
         return 1
     

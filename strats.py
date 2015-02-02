@@ -91,6 +91,7 @@ class AllerButBallon(SoccerStrategy):
 """
 Stratégie de tir
 Le joueur frappe le ballon en face de lui dans un angle aléatoire
+EN REVISION /!\
 """
 class Degagement(SoccerStrategy):
     def __init__(self):
@@ -100,7 +101,7 @@ class Degagement(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        tir = Vector2D.create_polar(player.angle + random()*4-2, 1)
+        tir = Vector2D.create_polar(player.angle + random(), 1)
         return SoccerAction(Vector2D(0,0), tir)
     def copy(self):
         return Degagement()

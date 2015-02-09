@@ -24,4 +24,4 @@ team5.add_player(SoccerPlayer("t1j2",Dribbleur()))
 team5.add_player(SoccerPlayer("t1j3",Intercepteur()))
 team5.add_player(SoccerPlayer("t1j4",Intercepteur()))
 
-teams =[team1, team3, team0, team5]
+teams =[team1, team3, team4, team5]

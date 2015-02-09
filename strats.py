@@ -264,7 +264,6 @@ class Intercepteur(SoccerStrategy):
     def __init__(self):
         self.inter = CompoStrat(Interception(), Tir())
         self.atck = CompoStrat(AllerVersBallon(), Tir())
-        self.drib = CompoStrat(Dribbleur(), Tir())
         self.aballon = 0
     def start_battle(self,state):
         pass
@@ -272,8 +271,7 @@ class Intercepteur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         dist = state.ball.position - player.position
-            return self.drib.compute_strategy(state, player, teamid)
-        elif(dist.norm < 15 or self.aballon == 1):
+        if(dist.norm < 15 or self.aballon == 1):
             self.aballon = 1
             return self.atck.compute_strategy(state, player, teamid)
         else:

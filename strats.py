@@ -171,7 +171,7 @@ class CompoStrat(SoccerStrategy):
     def create_strategy(self):
         return CompoStrat()
 """
-Stratégie fonceur
+Stratégie fonceurVideS
 Utilise stratégie AllerVersBallon
 """
 
@@ -204,8 +204,8 @@ class Defenseur(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        distance = state.ball.position - state.get_goal_center(teamid)
-        if(distance.norm < 40):
+        distance = state.ball.position - player.position
+        if(distance.norm < 20):
             return self.urgence.compute_strategy(state,player,teamid)
         else:
             return self.defense.compute_strategy(state,player,teamid)
@@ -213,7 +213,33 @@ class Defenseur(SoccerStrategy):
         return Defenseur()
     def create_strategy(self):
         return Defenseur()
+
+
+"""
+Stratégie défenseurv0.1
+Se place entre le ballon et le but et dégage le ballon
+"""
+
+class Defenseurv01(SoccerStrategy):
+    def __init__(self):
+        self.defense = CompoStrat(AllerButBallon(), Degagement())
+        self.urgence = Fonceur()
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        distance = state.ball.position - state.get_goal_center(teamid)
+        if(distance.norm < 40):
+            return self.urgence.compute_strategy(state,player,teamid)
+        else:
+            return self.defense.compute_strategy(state,player,teamid)
+    def copy(self):
+        return Defenseurv01()
+    def create_strategy(self):
+        return Defenseurv01()
         
+
 """
 Strategie dribbleur
 Essaye d'avoir un comportement imprévisible

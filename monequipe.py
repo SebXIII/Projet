@@ -18,10 +18,18 @@ team5=SoccerTeam("TryHard")
 team5.add_player(SoccerPlayer("t1j1",Intercepteur()))
 team5.add_player(SoccerPlayer("t1j2",Dribbleur()))
 
+team6=SoccerTeam("Maximum")
+team6.add_player(SoccerPlayer("t1j1",Defenseur()))
+team6.add_player(SoccerPlayer("t1j2",Dribbleur()))
+
+team7=SoccerTeam("Maximum v2")
+team7.add_player(SoccerPlayer("t1j1",Defenseur()))
+team7.add_player(SoccerPlayer("t1j2",Fonceur()))
+
 team3=SoccerTeam("Unicorn of Love 4v4")
 team3.add_player(SoccerPlayer("t1j1",Defenseur()))
 team3.add_player(SoccerPlayer("t1j2",Fonceur()))
 team3.add_player(SoccerPlayer("t1j3",Dribbleur()))
 team3.add_player(SoccerPlayer("t1j4",Intercepteur()))
 
-teams =[team1,team2,team3, team4, team5]
+teams =[team1,team2,team3, team4, team5, team6]

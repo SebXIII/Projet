@@ -14,10 +14,14 @@ team4=SoccerTeam("Versus Trying")
 team4.add_player(SoccerPlayer("t1j1",Fonceur()))
 team4.add_player(SoccerPlayer("t1j2",Dribbleur()))
 
+team5=SoccerTeam("TryHard")
+team5.add_player(SoccerPlayer("t1j1",Intercepteur()))
+team5.add_player(SoccerPlayer("t1j2",Dribbleur()))
+
 team3=SoccerTeam("Unicorn of Love 4v4")
 team3.add_player(SoccerPlayer("t1j1",Defenseur()))
 team3.add_player(SoccerPlayer("t1j2",Fonceur()))
 team3.add_player(SoccerPlayer("t1j3",Dribbleur()))
 team3.add_player(SoccerPlayer("t1j4",Intercepteur()))
 
-teams =[team1,team2,team3, team4]
+teams =[team1,team2,team3, team4, team5]

@@ -93,7 +93,7 @@ class Degagement(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        tir = Vector2D.create_polar(player.angle + random.random()*2-1, 1)
+        tir = Vector2D.create_polar(player.angle + 2.5, 100)
         return SoccerAction(Vector2D(0,0), tir)
     def create_strategy(self):
         return Degagement()
@@ -177,7 +177,7 @@ Stratégie défenseur
 Se place entre le ballon et le but et dégage le ballon
 """
 
-class Defenseur(SoccerStrategy):
+class Defonceur(SoccerStrategy):
     def __init__(self):
         self.defense = CompoStrat(AllerButBallon(), Degagement())
         self.urgence = Fonceur()
@@ -187,12 +187,12 @@ class Defenseur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         distance = state.ball.position - player.position
-        if(distance.norm < 20):
+        if(distance.norm < 10):
             return self.urgence.compute_strategy(state,player,teamid)
         else:
             return self.defense.compute_strategy(state,player,teamid)
     def create_strategy(self):
-        return Defenseur()
+        return Defenceur()
 
 
 """
@@ -200,7 +200,7 @@ Stratégie défenseurv0.1
 Se place entre le ballon et le but et dégage le ballon
 """
 
-class Defenseurv01(SoccerStrategy):
+class Defenseur(SoccerStrategy):
     def __init__(self):
         self.defense = CompoStrat(AllerButBallon(), Degagement())
         self.urgence = Fonceur()
@@ -210,12 +210,13 @@ class Defenseurv01(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         distance = state.ball.position - state.get_goal_center(teamid)
-        if(distance.norm < 40):
+        ball = state.ball.position - player.position
+        if(distance.norm < 40 or (ball.norm < 15 and distance.norm < 60)):
             return self.urgence.compute_strategy(state,player,teamid)
         else:
             return self.defense.compute_strategy(state,player,teamid)
     def create_strategy(self):
-        return Defenseurv01()
+        return Defenseur()
         
 
 """
@@ -264,6 +265,7 @@ class Intercepteur(SoccerStrategy):
     def __init__(self):
         self.inter = CompoStrat(Interception(), Tir())
         self.atck = CompoStrat(AllerVersBallon(), Dribble())
+        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.aballon = 0
     def start_battle(self,state):
         pass
@@ -271,6 +273,9 @@ class Intercepteur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         dist = state.ball.position - player.position
+        but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        if(but.norm < 25):
+            return self.fonceur.compute_strategy(state, player, teamid)
         if(dist.norm > 20):
             self.aballon = 0
         if(dist.norm < 3 or self.aballon):

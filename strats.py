@@ -4,6 +4,7 @@ from soccersimulator import PygletObserver,ConsoleListener,LogListener
 from soccersimulator import PLAYER_RADIUS, BALL_RADIUS
 import outils
 import random
+import pdb
 
 '''
 Stratégie Vide
@@ -108,6 +109,26 @@ class Degagement(SoccerStrategy):
         return Degagement()
 
 
+"""
+Stratégie de tir
+Le joueur dribble de façon imprévisible
+"""  
+class Dribble(SoccerStrategy):
+    def __init__(self):
+        pass
+    def start_battle(self,state):
+        elf.strat.locpass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+            dri = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+            drib = Vector2D.create_polar(dri.angle + random.random()*2-1,1)
+            return SoccerAction(Vector2D(0,0), drib)
+    def copy(self):
+        return Dribble()
+    def create_strategy(self):
+        return Dribble()
+
 
 """
 Stratégie de frappe
@@ -192,3 +213,74 @@ class Defenseur(SoccerStrategy):
         return Defenseur()
     def create_strategy(self):
         return Defenseur()
+        
+"""
+Strategie dribbleur
+Essaye d'avoir un comportement imprévisible
+"""
+
+class Dribbleur(SoccerStrategy):
+    def __init__(self):
+        self.drib = CompoStrat(AllerVersBallon(), Dribble())
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.drib.compute_strategy(state,player,teamid)
+    def copy(self):
+        return Dribbleur()
+    def create_strategy(self):
+        return Dribbleur()
+        
+"""
+Strategie interception
+Se dirige devant le ballon
+"""
+
+class Interception(SoccerStrategy):
+    def __init__(self):
+        self.strat = AllerVersLoc(Vector2D())
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        goalcen = state.get_goal_center(teamid)
+        goalcen = Vector2D(goalcen.x *0.1 + state.ball.position.x*0.9,goalcen.y *0.1 + state.ball.position.y*0.9)
+        self.strat.loc = goalcen
+        return self.strat.compute_strategy(state,player,teamid)
+    def copy(self):
+        return Interception()
+    def create_strategy(self):
+        return Interception()
+        
+"""
+Strategie d'intercepteur
+Se place devant le ballon et le prend au joueur adverse
+"""
+
+class Intercepteur(SoccerStrategy):
+    def __init__(self):
+        self.inter = CompoStrat(Interception(), Tir())
+        self.atck = CompoStrat(AllerVersBallon(), Tir())
+        self.drib = CompoStrat(Dribbleur(), Tir())
+        self.aballon = 0
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        dist = state.ball.position - player.position
+            return self.drib.compute_strategy(state, player, teamid)
+        elif(dist.norm < 15 or self.aballon == 1):
+            self.aballon = 1
+            return self.atck.compute_strategy(state, player, teamid)
+        else:
+            return self.inter.compute_strategy(state,player,teamid)
+    def copy(self):
+        strat = Intercepteur()
+        strat.aballon = self.aballon
+        return strat
+    def create_strategy(self):
+        return Intercepteur()

@@ -3,9 +3,6 @@ from soccersimulator import PygletObserver,ConsoleListener,LogListener
 from soccersimulator import pyglet
 from strats import AllerVersBallon, Tir, VideS, AllerVersLoc, CompoStrat, Fonceur, AllerButBallon, Degagement, Defenseur, Dribble, Dribbleur, Interception, Intercepteur
 
-team1=SoccerTeam("Panda 1v1")
-team1.add_player(SoccerPlayer("t1j1",Dribbleur()))
-
 team8=SoccerTeam("Pandragon 1v1")
 team8.add_player(SoccerPlayer("t1j1",Defenseur()))
 
@@ -20,9 +17,6 @@ team4=SoccerTeam("Versus Trying")
 team4.add_player(SoccerPlayer("t1j1",Fonceur()))
 team4.add_player(SoccerPlayer("t1j2",Dribbleur()))
 
-team5=SoccerTeam("TryHard")
-team5.add_player(SoccerPlayer("t1j1",Intercepteur()))
-team5.add_player(SoccerPlayer("t1j2",Dribbleur()))
 
 team6=SoccerTeam("Maximum")
 team6.add_player(SoccerPlayer("t1j1",Defenseur()))
@@ -38,4 +32,4 @@ team3.add_player(SoccerPlayer("t1j2",Fonceur()))
 team3.add_player(SoccerPlayer("t1j3",Dribbleur()))
 team3.add_player(SoccerPlayer("t1j4",Intercepteur()))
 
-teams =[team1,team2,team3, team4, team5, team6]
+teams =[team2,team3, team4, team6, team7, team8, team9]

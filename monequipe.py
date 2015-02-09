@@ -18,9 +18,9 @@ team4.add_player(SoccerPlayer("t1j1",Fonceur()))
 team4.add_player(SoccerPlayer("t1j2",Dribbleur()))
 
 
-team6=SoccerTeam("Maximum")
+team6=SoccerTeam("Defense all Balls")
 team6.add_player(SoccerPlayer("t1j1",Defenseur()))
-team6.add_player(SoccerPlayer("t1j2",Dribbleur()))
+team6.add_player(SoccerPlayer("t1j2",Defenseur()))
 
 team7=SoccerTeam("Maximum v2")
 team7.add_player(SoccerPlayer("t1j1",Defenseur()))

@@ -271,7 +271,7 @@ class Intercepteur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         dist = state.ball.position - player.position
-        if(dist.norm < 15 or self.aballon == 1):
+        if(dist.norm < 3 or self.aballon):
             self.aballon = 1
             return self.atck.compute_strategy(state, player, teamid)
         else:

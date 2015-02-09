@@ -6,9 +6,6 @@ from strats import AllerVersBallon, Tir, VideS, AllerVersLoc, CompoStrat, Fonceu
 team1=SoccerTeam("Pandragon 1v1")
 team1.add_player(SoccerPlayer("t1j1",Intercepteur()))
 
-team2=SoccerTeam("Super Pandragon 1v1")
-team2.add_player(SoccerPlayer("t1j1",Intercepteur()))
-
 team3=SoccerTeam("Tueur de fonceur 2v2")
 team3.add_player(SoccerPlayer("t1j1",Intercepteur()))
 team3.add_player(SoccerPlayer("t1j2",Defenseur()))
@@ -23,4 +20,4 @@ team5.add_player(SoccerPlayer("t1j2",Fonceur()))
 team5.add_player(SoccerPlayer("t1j3",Dribbleur()))
 team5.add_player(SoccerPlayer("t1j4",Intercepteur()))
 
-teams =[team1,team2, team3, team4, team5]
+teams =[team1, team3, team5]

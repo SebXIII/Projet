@@ -263,7 +263,7 @@ Se place devant le ballon et le prend au joueur adverse
 class Intercepteur(SoccerStrategy):
     def __init__(self):
         self.inter = CompoStrat(Interception(), Tir())
-        self.atck = CompoStrat(AllerVersBallon(), Tir())
+        self.atck = CompoStrat(AllerVersBallon(), Dribble())
         self.aballon = 0
     def start_battle(self,state):
         pass

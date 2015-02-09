@@ -20,8 +20,6 @@ class VideS(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         return SoccerAction()
-    def copy(self):
-        return VideS()
     def create_strategy(self):
         return VideS()
 
@@ -40,8 +38,6 @@ class AllerVersLoc(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         mouvement = self.loc - player.position
         return SoccerAction(mouvement)
-    def copy(self):
-        return AllerVersLoc()
     def create_strategy(self):
         return AllerVersLoc()
         
@@ -62,8 +58,6 @@ class AllerVersBallon(SoccerStrategy):
         self.strat.loc= state.ball.position
         #mouvement = state.ball.position - player.position
         return self.strat.compute_strategy(state,player,teamid)
-    def copy(self):
-        return AllerVersBallon()
     def create_strategy(self):
         return AllerVersBallon()
 
@@ -84,8 +78,6 @@ class AllerButBallon(SoccerStrategy):
         self.strat.loc.product = self.strat.loc.product(0.5)
         #mouvement = state.ball.position - player.position
         return self.strat.compute_strategy(state,player,teamid)
-    def copy(self):
-        return AllerButBallon()
     def create_strategy(self):
         return AllerButBallon()
 
@@ -103,8 +95,6 @@ class Degagement(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         tir = Vector2D.create_polar(player.angle + random.random()*2-1, 1)
         return SoccerAction(Vector2D(0,0), tir)
-    def copy(self):
-        return Degagement()
     def create_strategy(self):
         return Degagement()
 
@@ -124,8 +114,6 @@ class Dribble(SoccerStrategy):
             dri = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
             drib = Vector2D.create_polar(dri.angle + random.random()*2-1,1)
             return SoccerAction(Vector2D(0,0), drib)
-    def copy(self):
-        return Dribble()
     def create_strategy(self):
         return Dribble()
 
@@ -146,8 +134,6 @@ class Tir(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         return SoccerAction(Vector2D(0,0), tir)
-    def copy(self):
-        return Tir()
     def create_strategy(self):
         return Tir()
    
@@ -166,8 +152,6 @@ class CompoStrat(SoccerStrategy):
         move = self.s1.compute_strategy(state, player, teamid)
         shot = self.s2.compute_strategy(state, player, teamid)
         return SoccerAction(move.acceleration, shot.shoot)
-    def copy(self):
-        return CompoStrat()
     def create_strategy(self):
         return CompoStrat()
 """
@@ -184,8 +168,6 @@ class Fonceur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         return self.fonceur.compute_strategy(state,player,teamid)
-    def copy(self):
-        return Fonceur()
     def create_strategy(self):
         return Fonceur()
 
@@ -209,8 +191,6 @@ class Defenseur(SoccerStrategy):
             return self.urgence.compute_strategy(state,player,teamid)
         else:
             return self.defense.compute_strategy(state,player,teamid)
-    def copy(self):
-        return Defenseur()
     def create_strategy(self):
         return Defenseur()
 
@@ -234,8 +214,6 @@ class Defenseurv01(SoccerStrategy):
             return self.urgence.compute_strategy(state,player,teamid)
         else:
             return self.defense.compute_strategy(state,player,teamid)
-    def copy(self):
-        return Defenseurv01()
     def create_strategy(self):
         return Defenseurv01()
         
@@ -254,8 +232,6 @@ class Dribbleur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         return self.drib.compute_strategy(state,player,teamid)
-    def copy(self):
-        return Dribbleur()
     def create_strategy(self):
         return Dribbleur()
         
@@ -276,8 +252,6 @@ class Interception(SoccerStrategy):
         goalcen = Vector2D(goalcen.x *0.1 + state.ball.position.x*0.9,goalcen.y *0.1 + state.ball.position.y*0.9)
         self.strat.loc = goalcen
         return self.strat.compute_strategy(state,player,teamid)
-    def copy(self):
-        return Interception()
     def create_strategy(self):
         return Interception()
         
@@ -302,9 +276,5 @@ class Intercepteur(SoccerStrategy):
             return self.atck.compute_strategy(state, player, teamid)
         else:
             return self.inter.compute_strategy(state,player,teamid)
-    def copy(self):
-        strat = Intercepteur()
-        strat.aballon = self.aballon
-        return strat
     def create_strategy(self):
         return Intercepteur()

@@ -21,7 +21,7 @@ team0.add_player(SoccerPlayer("t1j2",Defonceur()))
 team5=SoccerTeam("Unicorn of Love 4v4")
 team5.add_player(SoccerPlayer("t1j1",DefMove()))
 team5.add_player(SoccerPlayer("t1j2",DefMove()))
-team5.add_player(SoccerPlayer("t1j3",Teamintercepteur()))
+team5.add_player(SoccerPlayer("t1j3",TeamIntercepteur()))
 team5.add_player(SoccerPlayer("t1j4",TeamIntercepteur()))
 
 teams =[team1, team4, team3, team5]

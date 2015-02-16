@@ -303,11 +303,11 @@ class SurIntercepteur(SoccerStrategy):
         self.atck = CompoStrat(AllerVersBallon(), Dribble())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.test = Outils()
-        self.attente = 150
+        self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
-        self.attente = 150
+        self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -332,11 +332,11 @@ class TeamIntercepteur(SoccerStrategy):
         self.atck = CompoStrat(AllerVersBallon(), Dribble())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.test = Outils()
-        self.attente = 150
+        self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
-        self.attente = 150
+        self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):

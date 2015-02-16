@@ -303,24 +303,53 @@ class SurIntercepteur(SoccerStrategy):
         self.atck = CompoStrat(AllerVersBallon(), Dribble())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.test = Outils()
+        self.attente = 150
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
-        pass
+        self.attente = 150
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
     #    a = self.test.distballon(self.test, teamid, 1) #TEST DEBUG
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
-        if(self.test.nbadvbalbut(state, teamid, player) == 2):
+        if(self.test.nbadvbalbut(state, teamid, player) == 2 and self.attente >= 1):
+            self.attente = self.attente - 1            
             return self.inter.compute_strategy(state, player, teamid)
-        if(self.test.nbadvbalbut(state, teamid, player) == 1):
+        if(self.test.nbadvbalbut(state, teamid, player) == 1 or self.attente == 0):
             return self.atck.compute_strategy(state, player, teamid)
         else:
             return self.fonceur.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return SurIntercepteur()
+        
+class TeamIntercepteur(SoccerStrategy):
+    def __init__(self):
+        self.inter = CompoStrat(Interception(), Tir())
+        self.atck = CompoStrat(AllerVersBallon(), Dribble())
+        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+        self.test = Outils()
+        self.attente = 150
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.attente = 150
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+    #    a = self.test.distballon(self.test, teamid, 1) #TEST DEBUG
+        dist = state.ball.position - player.position
+        but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        if(self.test.nbadvbalbut(state, teamid, player) == 4 and self.attente >= 1):
+            self.attente = self.attente - 1            
+            return self.inter.compute_strategy(state, player, teamid)
+        if(self.test.nbadvbalbut(state, teamid, player) >= 1 or self.attente == 0):
+            return self.atck.compute_strategy(state, player, teamid)
+        else:
+            return self.fonceur.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return TeamIntercepteur()
         
 """
 Stratégie de mouvement

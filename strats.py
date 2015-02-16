@@ -323,7 +323,9 @@ class SurIntercepteur(SoccerStrategy):
             return self.fonceur.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return SurIntercepteur()
-        
+'''
+Intercepteur 4v4
+'''     
 class TeamIntercepteur(SoccerStrategy):
     def __init__(self):
         self.inter = CompoStrat(Interception(), Tir())

@@ -274,7 +274,7 @@ class Esquive(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         out = Outils(state, teamid, player)
         goal = state.get_goal_center(outils.IDTeamOp(teamid))
-        yadv = out.jpro(True).y
+        yadv = out.jpro().y
         yme = player.position.y
         if(yadv > yme):
             dire = goal - player.position
@@ -408,7 +408,7 @@ class TeamIntercepteur(SoccerStrategy):
         if(test.nbadvbalbut(True) == 4 and self.attente >= 1):
             self.attente = self.attente - 1            
             return self.inter.compute_strategy(state, player, teamid)
-        if((self.test.nbadvbalbut(True) >= 1 or self.attente < 1) and abs(butx) > 15):
+        if((test.nbadvbalbut(True) >= 1 or self.attente < 1) and abs(butx) > 15):
             return self.atck.compute_strategy(state, player, teamid)
         else:
             return self.fonceur.compute_strategy(state,player,teamid)
@@ -455,6 +455,21 @@ class DefMove(SoccerStrategy):
 Stratégie de mouvement
 Suit le possesseur du ballon, recupère le ballon s'il le perd
 '''
+class Follow(SoccerStrategy):
+    def __init__(self):
+        pass
+    def start_battle(self,state):
+        pass
+    def begin_battles(self, state,count,max_step):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        outil = Outils(state, teamid, player)        
+        allie = outil.distallballon
+    def create_strategy(self):
+        return Follow()
+
 ############################################################################################################################################################
 ############################################################################################################################################################        
 ############################################################################################################################################################ 
@@ -484,6 +499,23 @@ class Outils(SoccerState):
         return dist
         
     '''
+    Donne la distance de l'allié (pas soi) le plus proche au ballon
+    '''
+    def distallballon(self):
+        dist = 9999       
+        if(self.team == 1):
+            for p in self.state.team1 :
+                if(self.player.position != p.position):
+                    vec = self.state.ball.position - p.position
+                    dist = min(vec.norm, dist)
+        else:
+            for p in self.state.team2 :
+                if(self.player.position != p.position):
+                    vec = self.state.ball.position - p.position
+                    dist = min(vec.norm, dist)
+        return dist
+        
+    '''
     Donne le nombre d'adversaire entre la balle et le but (ou le nombre d'allié si adv false)
     '''
     def nbadvbalbut(self, adv):
@@ -504,12 +536,12 @@ class Outils(SoccerState):
     
     
     '''
-    Donne la position du joueur adverse le plus proche si adv, allié sinon
+    Donne la position du joueur adverse le plus proche du but si adv, allié sinon
     '''
-    def jpro(self, adv):
+    def jpro(self):
         dist = 9999
         vec = Vector2D(0,0)
-        if((self.team == 2 and adv) or (self.team == 1 and not adv)):
+        if(self.team == 2):
             for p in self.state.team1 :
                 distmebut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.player.position
                 distluibut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position

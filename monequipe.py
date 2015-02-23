@@ -10,13 +10,13 @@ team4=SoccerTeam("Fnatic 2v2")
 team4.add_player(SoccerPlayer("t1j1",DefMove()))
 team4.add_player(SoccerPlayer("t1j2",SurIntercepteur()))
 
-team3=SoccerTeam("Elements 2v2")
+team3=SoccerTeam("SK 2v2")
 team3.add_player(SoccerPlayer("t1j1",SurIntercepteur()))
 team3.add_player(SoccerPlayer("t1j2",Attaquant()))
 
 team0=SoccerTeam("Versus Trying")
 team0.add_player(SoccerPlayer("t1j1",DefMove()))
-team0.add_player(SoccerPlayer("t1j2",Defonceur()))
+team0.add_player(SoccerPlayer("t1j2",VideS()))
 
 team5=SoccerTeam("Unicorn of Love 4v4")
 team5.add_player(SoccerPlayer("t1j1",Defonceur()))

@@ -205,15 +205,15 @@ class Defenseur(SoccerStrategy):
     def __init__(self):
         self.defense = CompoStrat(AllerButBallon(), Degagement())
         self.urgence = Intercepteur()
-        self.out = Outils()
     def start_battle(self,state):
         pass
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        out = Outils(state, teamid, player)
         distance = state.ball.position - state.get_goal_center(teamid)
         ball = state.ball.position - player.position
-        if(self.out.nbadvbalbut(state, outils.IDTeamOp(teamid), player) <= 1):
+        if(out.nbadvbalbut(False) <= 1):
             return self.urgence.compute_strategy(state,player,teamid)
         else:
             return self.defense.compute_strategy(state,player,teamid)
@@ -266,14 +266,15 @@ Tir de manière à éviter les adversaires
    
 class Esquive(SoccerStrategy):
     def __init__(self):
-        self.out = Outils()
+        pass
     def start_battle(self,state):
         pass
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        out = Outils(state, teamid, player)
         goal = state.get_goal_center(outils.IDTeamOp(teamid))
-        yadv = self.out.jpro(state, teamid, player).y
+        yadv = out.jpro(True).y
         yme = player.position.y
         if(yadv > yme):
             dire = goal - player.position
@@ -296,7 +297,6 @@ class Attaquant(SoccerStrategy):
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
         self.defen = CompoStrat(AllerVersBallon(), Degagement())
         self.aballon = 0
-        self.test = Outils()
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
@@ -304,6 +304,7 @@ class Attaquant(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
     #    a = self.test.distballon(self.test, teamid, 1) #TEST DEBUG        
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
@@ -318,7 +319,6 @@ class Attaquant(SoccerStrategy):
             return self.defen.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return Intercepteur()
-
 """
 Strategie d'intercepteur
 Se place devant le ballon et le prend au joueur adverse
@@ -330,7 +330,7 @@ class Intercepteur(SoccerStrategy):
         self.atck = CompoStrat(AllerVersBallon(), Dribble())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.aballon = 0
-        self.test = Outils()
+        self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
@@ -338,6 +338,7 @@ class Intercepteur(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
     #    a = self.test.distballon(self.test, teamid, 1) #TEST DEBUG        
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
@@ -345,10 +346,11 @@ class Intercepteur(SoccerStrategy):
             return self.fonceur.compute_strategy(state, player, teamid)
         if(dist.norm > 20):
             self.aballon = 0
-        if(dist.norm < 3 or self.aballon):
+        if(dist.norm < 3 or self.aballon or self.attente < 0):
             self.aballon = 1
             return self.atck.compute_strategy(state, player, teamid)
         else:
+            self.attente = self.attente - 1
             return self.inter.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return Intercepteur()
@@ -362,7 +364,6 @@ class SurIntercepteur(SoccerStrategy):
         self.inter = CompoStrat(Interception(), Tir())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
-        self.test = Outils()
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         pass
@@ -371,13 +372,14 @@ class SurIntercepteur(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         butx = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
-        if(self.test.nbadvbalbut(state, teamid, player) == 2 and self.attente >= 1):
+        if(test.nbadvbalbut(True) == 2 and self.attente >= 1):
             self.attente = self.attente - 1            
             return self.inter.compute_strategy(state, player, teamid)
-        if((self.test.nbadvbalbut(state, teamid, player) == 1 or self.attente < 1) and abs(butx) > 15):
+        if((test.nbadvbalbut(True) == 1 or self.attente < 1) and abs(butx) > 15):
             return self.atck.compute_strategy(state, player, teamid)
         else:
             return self.fonceur.compute_strategy(state,player,teamid)
@@ -391,7 +393,6 @@ class TeamIntercepteur(SoccerStrategy):
         self.inter = CompoStrat(Interception(), Tir())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
-        self.test = Outils()
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         pass
@@ -400,13 +401,14 @@ class TeamIntercepteur(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)        
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         butx = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
-        if(self.test.nbadvbalbut(state, teamid, player) == 4 and self.attente >= 1):
+        if(test.nbadvbalbut(True) == 4 and self.attente >= 1):
             self.attente = self.attente - 1            
             return self.inter.compute_strategy(state, player, teamid)
-        if((self.test.nbadvbalbut(state, teamid, player) >= 1 or self.attente < 1) and abs(butx) > 15):
+        if((self.test.nbadvbalbut(True) >= 1 or self.attente < 1) and abs(butx) > 15):
             return self.atck.compute_strategy(state, player, teamid)
         else:
             return self.fonceur.compute_strategy(state,player,teamid)
@@ -424,7 +426,6 @@ class DefMove(SoccerStrategy):
         self.attente = CompoStrat(VideS(), VideS())
         self.aggro = CompoStrat(AllerVersBallon(), Degagement())
         self.revanche = CompoStrat(AllerVersBallon(), Tir())
-        self.out = Outils()
         self.adefendu = False
     def start_battle(self,state):
         pass
@@ -433,7 +434,8 @@ class DefMove(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        distance = self.out.distadvballon(state, teamid, player)
+        out = Outils(state, teamid, player)
+        distance = out.distadvballon()
         distball = state.ball.position - player.position
         if(self.adefendu):
             return self.revanche.compute_strategy(state,player,teamid)
@@ -449,59 +451,100 @@ class DefMove(SoccerStrategy):
     def create_strategy(self):
         return DefMove()
         
+'''
+Stratégie de mouvement
+Suit le possesseur du ballon, recupère le ballon s'il le perd
+'''
+############################################################################################################################################################
+############################################################################################################################################################        
 ############################################################################################################################################################ 
 #OUTILS
 ############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
 class Outils(SoccerState):
-    def __init__(self):
+    def __init__(self, state, team, player):
+        self.team = team
+        self.player = player
+        self.state = state
         pass        
-    
-    def distadvballon(self, state, team, player):
+    '''
+    Donne la distance de l'adversaire le plus proche au ballon
+    '''
+    def distadvballon(self):
         dist = 9999       
-        if(team == 2):
-            for p in state.team1 :
-                vec = state.ball.position - p.position
+        if(self.team == 2):
+            for p in self.state.team1 :
+                vec = self.state.ball.position - p.position
                 dist = min(vec.norm, dist)
         else:
-            for p in state.team2 :
-                vec = state.ball.position - p.position
+            for p in self.state.team2 :
+                vec = self.state.ball.position - p.position
                 dist = min(vec.norm, dist)
         return dist
         
-    def nbadvbalbut(self, state, team, player):
+    '''
+    Donne le nombre d'adversaire entre la balle et le but (ou le nombre d'allié si adv false)
+    '''
+    def nbadvbalbut(self, adv):
         nb = 0
-        if(team == 2):
-            for p in state.team1 :
-                distun = state.get_goal_center(outils.IDTeamOp(team)) - p.position 
-                distdeux = state.get_goal_center(outils.IDTeamOp(team)) - state.ball.position 
+        if((self.team == 2 and adv) or (self.team == 1 and not adv)):
+            for p in self.state.team1 :
+                distun = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position 
+                distdeux = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.state.ball.position 
                 if(distun.norm < distdeux.norm):
                     nb = nb + 1
         else:
-            for p in state.team2 :
-                distun = state.get_goal_center(outils.IDTeamOp(team)) - p.position 
-                distdeux = state.get_goal_center(outils.IDTeamOp(team)) - state.ball.position
+            for p in self.state.team2 :
+                distun = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position 
+                distdeux = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.state.ball.position
                 if(distun.norm < distdeux.norm):
                     nb = nb+1
         return nb
     
-    def jpro(self, state, team, player):
+    
+    '''
+    Donne la position du joueur adverse le plus proche si adv, allié sinon
+    '''
+    def jpro(self, adv):
         dist = 9999
         vec = Vector2D(0,0)
-        if(team == 2):
-            for p in state.team1 :
-                distmebut = state.get_goal_center(outils.IDTeamOp(team)) - player.position
-                distluibut = state.get_goal_center(outils.IDTeamOp(team)) - p.position
-                distmelui = p.position - player.position
+        if((self.team == 2 and adv) or (self.team == 1 and not adv)):
+            for p in self.state.team1 :
+                distmebut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.player.position
+                distluibut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position
+                distmelui = p.position - self.player.position
                 if(distluibut.norm < distmebut.norm and distmelui.norm < dist):
                     dist = distmelui.norm
                     vec = p.position
         else:
-            for p in state.team2 :
-                distmebut = state.get_goal_center(outils.IDTeamOp(team)) - player.position 
-                distluibut = state.get_goal_center(outils.IDTeamOp(team)) - p.position
-                distmelui = p.position - player.position
+            for p in self.state.team2 :
+                distmebut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.player.position 
+                distluibut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position
+                distmelui = p.position - self.player.position
                 if(distluibut.norm < distmebut.norm and distmelui.norm < dist):
                     dist = distmelui.norm
                     vec = p.position
         return vec
+    
+    '''
+    Rend True si son équipe a le ballon, False sinon
+    '''
+    def equipeballo(self):
+        dist = 9999
+        for p in self.state.team1 :
+                distballon = self.state.ball.position - p.position
+                if(distballon.norm < dist):
+                    dist = distballon.norm
+        dist2 = 9999
+        for q in self.state.team2 :
+                distballon2 = state.ball.position - q.position
+                if(distballon.norm < dist):
+                    dist2 = distballon2.norm
+        if(((dist1 < dist2 and self.team == 1) or (dist1 > dist2 and self.team == 2)) and dist2 < GAME_WIDTH * 0.2):
+            return True
+        else:
+            return False
         
+        
+                    

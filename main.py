@@ -24,10 +24,4 @@ obs=PygletObserver()
 obs.set_soccer_battle(battle)
 pyglet.app.run()
 
-
-
-'''
-TO DO LIST :
-    Debug DefMove
-    Avancer dans Attaquant
-'''
+1

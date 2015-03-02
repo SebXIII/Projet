@@ -253,7 +253,7 @@ class Interception(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         goalcen = state.get_goal_center(teamid)
-        goalcen = Vector2D(goalcen.x *0.15 + state.ball.position.x*0.85,goalcen.y *0.1 + state.ball.position.y*0.9)
+        goalcen = Vector2D(goalcen.x *0.05 + state.ball.position.x*0.95,goalcen.y *0.1 + state.ball.position.y*0.9)
         self.strat.loc = goalcen
         return self.strat.compute_strategy(state,player,teamid)
     def create_strategy(self):
@@ -329,6 +329,7 @@ class Intercepteur(SoccerStrategy):
     def __init__(self):
         self.inter = CompoStrat(Interception(), Tir())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
+        self.atck2 = CompoStrat(AllerVersBallon(), Dribble())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):

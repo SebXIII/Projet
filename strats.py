@@ -1,11 +1,10 @@
 # coding=utf-8
 from soccersimulator import Vector2D, SoccerBattle, SoccerPlayer, SoccerTeam, SoccerAction, SoccerStrategy, SoccerState
 from soccersimulator import PygletObserver,ConsoleListener,LogListener
-from soccersimulator import PLAYER_RADIUS, BALL_RADIUS, GAME_WIDTH, GAME_HEIGHT
+from soccersimulator import PLAYER_RADIUS, BALL_RADIUS, GAME_WIDTH, GAME_HEIGHT, GAME_GOAL_HEIGHT
 import outils
 import random
 import pdb
-
 
 '''
 Stratégie Vide
@@ -117,6 +116,35 @@ class Dribble(SoccerStrategy):
             return SoccerAction(Vector2D(0,0), drib)
     def create_strategy(self):
         return Dribble()
+        
+"""
+Stratégie de frappe
+Le joueur tire vers le but de façon vicieuse
+"""     
+        
+        
+class Tirv(SoccerStrategy):
+    def __init__(self):
+        pass
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.random = random.random() * 2
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        tir = Vector2D(0,0)
+        tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        if(self.random >= 1):
+            tir.x = tir.x - (GAME_GOAL_HEIGHT / 2) * 0.80
+            tir.y = tir.y - (GAME_GOAL_HEIGHT / 2)*0.80
+        if(self.random < 1):
+            tir.x = tir.x + (GAME_GOAL_HEIGHT / 2)*0.80
+            tir.y = tir.y + (GAME_GOAL_HEIGHT / 2)*0.80
+            
+        return SoccerAction(Vector2D(0,0), tir)
+    def create_strategy(self):
+        return Tirv()
 
 
 """
@@ -147,6 +175,9 @@ class CompoStrat(SoccerStrategy):
         self.s2 = strat2
     def start_battle(self,state):
         pass
+    def begin_battles(self,state,count,max_step):
+        self.s1.begin_battles(state, count, max_step)
+        self.s2.begin_battles(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -162,9 +193,11 @@ Utilise stratégie AllerVersBallon
 
 class Fonceur(SoccerStrategy):
     def __init__(self):
-        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+        self.fonceur = CompoStrat(AllerVersBallon(), Tirv())
     def start_battle(self,state):
         pass
+    def begin_battles(self,state,count,max_step):
+        self.fonceur.begin_battles(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -184,6 +217,8 @@ class Defonceur(SoccerStrategy):
         self.urgence = Fonceur()
     def start_battle(self,state):
         pass
+    def begin_battles(self,state,count,max_step):
+        self.urgence.begin_battles(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -299,7 +334,7 @@ class Attaquant(SoccerStrategy):
         self.aballon = 0
     def start_battle(self,state):
         pass
-    def begin_battles(self,state,couent,max_step):
+    def begin_battles(self,state,count,max_step):
         self.aballon = 0
     def finish_battle(self,won):
         pass
@@ -326,15 +361,18 @@ Se place devant le ballon et le prend au joueur adverse
 
 class Intercepteur(SoccerStrategy):
     def __init__(self):
-        self.inter = CompoStrat(Interception(), Tir())
+        self.inter = CompoStrat(Interception(), Degagement())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
-        self.atck2 = CompoStrat(AllerVersBallon(), Dribble())
-        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+        self.fonceur = CompoStrat(AllerVersBallon(), Tirv())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
+        self.inter.CompoStrat(state, count, max_step)
+        self.atck.CompoStrat(state, count, max_step)
+        self.fonceur.CompoStrat(state, count, max_step)
+        self.attente.CompoStrat(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -358,14 +396,16 @@ Se place devant le ballon et le prend au joueur adverse V2.0
 """
 class SurIntercepteur(SoccerStrategy):
     def __init__(self):
-        self.inter = CompoStrat(Interception(), Tir())
+        self.inter = CompoStrat(Interception(), Degagement())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
-        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+        self.fonceur = CompoStrat(AllerVersBallon(), Tirv())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
+        self.fonceur.begin_battles(state, count, max_step)
+        self.inter.begin_battles(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -387,14 +427,16 @@ Intercepteur 4v4
 '''     
 class TeamIntercepteur(SoccerStrategy):
     def __init__(self):
-        self.inter = CompoStrat(Interception(), Tir())
+        self.inter = CompoStrat(Interception(), Tirv())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
-        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+        self.fonceur = CompoStrat(AllerVersBallon(), Tirv())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
+        self.fonceur.begin_battles(state, count, max_step)
+        self.inter.begin_battles(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
@@ -422,12 +464,14 @@ class DefMove(SoccerStrategy):
         self.subti = CompoStrat(Fonceur(), VideS())
         self.attente = CompoStrat(VideS(), VideS())
         self.aggro = CompoStrat(AllerVersBallon(), Degagement())
-        self.revanche = CompoStrat(AllerVersBallon(), Tir())
+        self.revanche = CompoStrat(AllerVersBallon(), Tirv())
         self.adefendu = False
     def start_battle(self,state):
         pass
     def begin_battles(self, state,count,max_step):
         self.adefendu = False
+        self.subti.begin_battles(state, count, max_step)
+        self.revanche.begin_battles(state, count, max_step)
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):

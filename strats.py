@@ -211,7 +211,6 @@ class Defenseur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         out = Outils(state, teamid, player)
-        print out.equipeballo()
         distance = state.ball.position - state.get_goal_center(teamid)
         ball = state.ball.position - player.position
         if(out.nbadvbalbut(False) <= 1):
@@ -253,7 +252,7 @@ class Interception(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         goalcen = state.get_goal_center(teamid)
-        goalcen = Vector2D(goalcen.x *0.05 + state.ball.position.x*0.95,goalcen.y *0.1 + state.ball.position.y*0.9)
+        goalcen = Vector2D(goalcen.x *0.1 + state.ball.position.x*0.9,goalcen.y *0.1 + state.ball.position.y*0.9)
         self.strat.loc = goalcen
         return self.strat.compute_strategy(state,player,teamid)
     def create_strategy(self):
@@ -594,13 +593,15 @@ class Outils(SoccerState):
         for p in self.state.team1 :
                 distballon = self.state.ball.position - p.position
                 if(distballon.norm < dist):
-                    dist = distballon.norm
-        dist2 = 9999
+                    dist1 = distballon.norm
+                    dist = dist1
+        dist = 9999
         for q in self.state.team2 :
                 distballon2 = self.state.ball.position - q.position
-                if(distballon.norm < dist):
+                if(distballon2.norm < dist):
                     dist2 = distballon2.norm
-        if(((dist1 < dist2 and self.team == 1) or (dist1 > dist2 and self.team == 2)) and dist2 < GAME_WIDTH * 0.2):
+                    dist = dist2
+        if(((dist1 < dist2 and self.team == 1) or (dist1 > dist2 and self.team == 2)) and (dist2 < GAME_WIDTH * 0.09 or dist1 < GAME_WIDTH * 0.09)):
             return True
         else:
             return False

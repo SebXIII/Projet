@@ -10,8 +10,8 @@ from soccersimulator import SoccerBattle
 from monequipe import teams
 
 
-team1=teams[0] # rouge
-team2 = teams[0]
+team1=teams[3] # rouge
+team2 = teams[3]
 '''
 if len(teams)>1:
     team2=teams[1]
@@ -23,5 +23,3 @@ battle=SoccerBattle(team1,team2)
 obs=PygletObserver()
 obs.set_soccer_battle(battle)
 pyglet.app.run()
-
-1

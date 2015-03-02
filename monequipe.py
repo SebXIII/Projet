@@ -4,7 +4,7 @@ from soccersimulator import pyglet
 from strats import AllerVersBallon, Esquive, Attaquant, Tir, TeamIntercepteur, VideS, AllerVersLoc, CompoStrat, Fonceur, DefMove, AllerButBallon, Degagement, Defonceur, Defenseur, Dribble, Dribbleur, SurIntercepteur ,Interception, Intercepteur
 
 team1=SoccerTeam("Team Solo Mid 1v1")
-team1.add_player(SoccerPlayer("WildTurtle",Intercepteur()))
+team1.add_player(SoccerPlayer("Dyrus",Intercepteur()))
 
 team4=SoccerTeam("Fnatic 2v2")
 team4.add_player(SoccerPlayer("t1j1",DefMove()))

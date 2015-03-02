@@ -330,30 +330,25 @@ class Intercepteur(SoccerStrategy):
         self.inter = CompoStrat(Interception(), Tir())
         self.atck = CompoStrat(AllerVersBallon(), Esquive())
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
-        self.aballon = 0
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
-        self.aballon = 0
         self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
-    #    a = self.test.distballon(self.test, teamid, 1) #TEST DEBUG        
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
-        if(but.norm < 25):
-            return self.fonceur.compute_strategy(state, player, teamid)
-        if(dist.norm > 20):
-            self.aballon = 0
-        if(dist.norm < 3 or self.aballon or self.attente < 0):
-            self.aballon = 1
+        butx = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
+        if(test.nbadvbalbut(True) == 1 and self.attente >= 1):
+            self.attente = self.attente - 1            
+            return self.inter.compute_strategy(state, player, teamid)
+        if((test.nbadvbalbut(True) == 1 or self.attente < 1) and abs(butx) > 15):
             return self.atck.compute_strategy(state, player, teamid)
         else:
-            self.attente = self.attente - 1
-            return self.inter.compute_strategy(state,player,teamid)
+            return self.fonceur.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return Intercepteur()
 

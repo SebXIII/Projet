@@ -332,7 +332,7 @@ class Intercepteur(SoccerStrategy):
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
-        pass
+        self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
@@ -363,7 +363,7 @@ class SurIntercepteur(SoccerStrategy):
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
-        pass
+        self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
@@ -392,7 +392,7 @@ class TeamIntercepteur(SoccerStrategy):
         self.fonceur = CompoStrat(AllerVersBallon(), Tir())
         self.attente = random.random() * 100 + 150
     def start_battle(self,state):
-        pass
+        self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
     def finish_battle(self,won):

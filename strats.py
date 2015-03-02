@@ -336,6 +336,7 @@ class Intercepteur(SoccerStrategy):
         pass
     def begin_battles(self,state,count,max_step):
         self.aballon = 0
+        self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):

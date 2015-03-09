@@ -8,7 +8,7 @@ team1.add_player(SoccerPlayer("Dyrus",Intercepteur()))
 
 team4=SoccerTeam("Fnatic 2v2")
 team4.add_player(SoccerPlayer("Reignover",Follow()))
-team4.add_player(SoccerPlayer("Steeelback",Fonceur()))
+team4.add_player(SoccerPlayer("Steeelback",SurIntercepteur()))
 
 team3=SoccerTeam("SK 2v2")
 team3.add_player(SoccerPlayer("Fredy122",SurIntercepteur()))

@@ -55,7 +55,7 @@ class AllerVersBallon(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        self.strat.loc= state.ball.position
+        self.strat.loc= state.ball.position + state.ball.speed
         #mouvement = state.ball.position - player.position
         return self.strat.compute_strategy(state,player,teamid)
     def create_strategy(self):
@@ -94,7 +94,7 @@ class Degagement(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
-        if(test.canshoot):
+        if(test.canshoot()):
             tir = Vector2D.create_polar(player.angle + 2.5, 100)
         else:
             tir = Vector2D(0,0)
@@ -117,7 +117,7 @@ class Dribble(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         dri = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         test = Outils(state, teamid, player)
-        if(test.canshoot):
+        if(test.canshoot()):
             drib = Vector2D.create_polar(dri.angle + random.random()*2-1,1)
         else:
             drib = Vector2D(0,0)
@@ -145,12 +145,12 @@ class Tirv(SoccerStrategy):
         tir = Vector2D(0,0)
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         if(self.random >= 1):
-            tir.x = tir.x - (GAME_GOAL_HEIGHT / 2) * 0.80
-            tir.y = tir.y - (GAME_GOAL_HEIGHT / 2)*0.80
+            tir.x = tir.x - (GAME_GOAL_HEIGHT / 2) * 0.75
+            tir.y = tir.y - (GAME_GOAL_HEIGHT / 2)*0.75
         if(self.random < 1):
-            tir.x = tir.x + (GAME_GOAL_HEIGHT / 2)*0.80
-            tir.y = tir.y + (GAME_GOAL_HEIGHT / 2)*0.80
-        if(test.canshoot):
+            tir.x = tir.x + (GAME_GOAL_HEIGHT / 2)*0.75
+            tir.y = tir.y + (GAME_GOAL_HEIGHT / 2)*0.75
+        if(test.canshoot()):
             return SoccerAction(Vector2D(0,0), tir)
         else:
             return SoccerAction(Vector2D(0,0),Vector2D(0,0))
@@ -174,7 +174,7 @@ class Tir(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
-        if(test.canshoot):
+        if(test.canshoot()):
             return SoccerAction(Vector2D(0,0), tir)
         else:
             return SoccerAction(Vector2D(0,0),Vector2D(0,0))
@@ -328,12 +328,14 @@ class Esquive(SoccerStrategy):
         yme = player.position.y
         if(yadv > yme):
             dire = goal - player.position
-            go = Vector2D.create_polar(dire.angle - 0.35, 1)
+            go = Vector2D.create_polar(dire.angle - 0.35, 2)
         else:           
             dire = goal - player.position
-            go = Vector2D.create_polar(dire.angle + 0.35, 1)
-        
-        return SoccerAction(Vector2D(0,0), go)
+            go = Vector2D.create_polar(dire.angle + 0.35, 2)
+        if(out.canshoot()):
+            return SoccerAction(Vector2D(0,0), go)
+        else:
+            return SoccerAction(Vector2D(0,0), Vector2D(0,0))
     def create_strategy(self):
         return Esquive()
 
@@ -384,14 +386,15 @@ class Intercepteur(SoccerStrategy):
         self.attente = random.random() * 100 + 150
     def begin_battles(self,state,count,max_step):
         self.attente = random.random() * 100 + 150
-        self.inter.CompoStrat(state, count, max_step)
-        self.atck.CompoStrat(state, count, max_step)
-        self.fonceur.CompoStrat(state, count, max_step)
-        self.attente.CompoStrat(state, count, max_step)
+        self.inter.begin_battles(state, count, max_step)
+        self.atck.begin_battles(state, count, max_step)
+        self.fonceur.begin_battles(state, count, max_step)
+        self.attente = random.random() * 100 + 150
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
+        print test.distallballon()
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         butx = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
@@ -506,23 +509,57 @@ class DefMove(SoccerStrategy):
             return self.defense.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return DefMove()
-        
 '''
 Stratégie de mouvement
-Suit le possesseur du ballon, recupère le ballon s'il le perd
+Suit l'allié le plus proche
 '''
-class Follow(SoccerStrategy):
-    def __init__(self):
+class Suivre(SoccerStrategy):
+    def __init__(self):       
         pass
     def start_battle(self,state):
-        pass
-    def begin_battles(self, state,count,max_step):
         pass
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        outil = Outils(state, teamid, player)        
-        allie = outil.distallballon
+        outil = Outils(state, teamid, player)
+        mouvement = outil.jproall() - player.position
+        return SoccerAction(mouvement, Vector2D(0,0))
+    def create_strategy(self):
+        return Suivre()
+
+'''
+Stratégie d'attaque
+Suit le possesseur du ballon, recupère le ballon s'il le perd
+SI EQP BALLON ET + PROCHE => ATK
+ELSE => SUIT
+'''
+class Follow(SoccerStrategy):
+    def __init__(self):
+        self.but = CompoStrat(AllerVersBallon(), Tirv())
+        self.esquive = CompoStrat(AllerVersBallon(), Esquive())
+        self.suivre = CompoStrat(Suivre(), Esquive())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self, state,count,max_step):
+        self.but.begin_battles(state, count, max_step)
+        self.esquive.begin_battles(state, count, max_step)
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        outil = Outils(state, teamid, player)
+        allie = outil.jproall()
+        dist = state.ball.position - player.position
+        but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        dist2 = state.ball.position - allie
+        if(outil.equipeballo() and dist.norm < dist2.norm):
+            but = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
+            if(abs(but) < 15):
+                return self.but.compute_strategy(state, player, teamid)
+            else:
+                return self.esquive.compute_strategy(state, player, teamid)
+        else:
+            return self.suivre.compute_strategy(state, player, teamid)
     def create_strategy(self):
         return Follow()
 
@@ -624,6 +661,32 @@ class Outils(SoccerState):
         return vec
         
     '''
+    Donne la position du joueur allié le plus proche
+    '''
+    def jproall(self):
+        dist = 9999
+        vec = Vector2D(0,0)
+        if(self.team == 1):
+            for p in self.state.team1 :
+                if(p.position != self.player.position):
+                    distmebut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.player.position
+                    distluibut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position
+                    distmelui = p.position - self.player.position
+                    if(distluibut.norm < distmebut.norm and distmelui.norm < dist):
+                        dist = distmelui.norm
+                        vec = p.position
+        else:
+            for p in self.state.team2 :
+                if(p.position != self.player.position):
+                    distmebut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - self.player.position 
+                    distluibut = self.state.get_goal_center(outils.IDTeamOp(self.team)) - p.position
+                    distmelui = p.position - self.player.position
+                    if(distluibut.norm < distmebut.norm and distmelui.norm < dist):
+                        dist = distmelui.norm
+                        vec = p.position
+        return vec
+        
+    '''
     Rend la position du joueur adverse le plus proche du ballon
     '''
     def jball(self):
@@ -665,12 +728,13 @@ class Outils(SoccerState):
         else:
             return False
         
+        
     '''
     Rend True si le joueur peut tirer
     '''
     def canshoot(self):
-        dist = state.ball.position - player.position
-        if(dist < PLAYER_RADIUS + BALL_RADIUS):
+        dist = self.state.ball.position - self.player.position
+        if(dist.norm < PLAYER_RADIUS + BALL_RADIUS):
             return True
         else:
             return False

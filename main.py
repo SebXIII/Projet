@@ -1,4 +1,4 @@
-1# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Mon Jan 26 19:04:42 2015
 @author: baskiotisn
@@ -9,8 +9,8 @@ from soccersimulator import PygletObserver
 from soccersimulator import SoccerBattle
 from monequipe import teams
 
-team1=teams[1] # rouge
-team2 = teams[2]
+team1=teams[2] # rouge
+team2 = teams[1]
 '''
 if len(teams)>1:
     team2=teams[1]

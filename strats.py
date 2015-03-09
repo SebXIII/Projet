@@ -36,8 +36,8 @@ class AllerVersLoc(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        mouvement = self.loc - player.position
-        return SoccerAction(mouvement)
+        mouvement = self.loc - player.position        
+        return SoccerAction(mouvement, Vector2D(0,0))
     def create_strategy(self):
         return AllerVersLoc()
         
@@ -202,7 +202,7 @@ class CompoStrat(SoccerStrategy):
     def create_strategy(self):
         return CompoStrat()
 """
-Stratégie fonceurVideS
+Stratégie fonceur
 Utilise stratégie AllerVersBallon
 """
 
@@ -522,7 +522,11 @@ class Suivre(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         outil = Outils(state, teamid, player)
-        mouvement = outil.jproall() - player.position
+        loc1 = outil.jproall().copy()
+        loc2 = state.get_goal_center(teamid).copy()
+        loc1.scale(0.9)
+        loc2.scale(0.1)
+        mouvement = loc1 + loc2 - player.position
         return SoccerAction(mouvement, Vector2D(0,0))
     def create_strategy(self):
         return Suivre()
@@ -552,7 +556,7 @@ class Follow(SoccerStrategy):
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         dist2 = state.ball.position - allie
-        if(outil.equipeballo() and dist.norm < dist2.norm):
+        if(not outil.equiperbal()):
             but = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
             if(abs(but) < 15):
                 return self.but.compute_strategy(state, player, teamid)
@@ -727,7 +731,29 @@ class Outils(SoccerState):
             return True
         else:
             return False
-        
+
+    '''
+    Rend True si son équipe (pas lui) a le ballon, False sinon
+    '''
+    def equiperbal(self):
+        dist = 9999
+        for p in self.state.team1 :
+                if(p.position != self.player.position):
+                    distballon = self.state.ball.position - p.position
+                    if(distballon.norm < dist):
+                        dist1 = distballon.norm
+                        dist = dist1
+        dist = 9999
+        for q in self.state.team2 :
+                if(q.position != self.player.position):              
+                    distballon2 = self.state.ball.position - q.position
+                    if(distballon2.norm < dist):
+                        dist2 = distballon2.norm
+                        dist = dist2
+        if(((dist1 < dist2 and self.team == 1) or (dist1 > dist2 and self.team == 2)) and (dist2 < GAME_WIDTH * 0.09 or dist1 < GAME_WIDTH * 0.09)):
+            return True
+        else:
+            return False
         
     '''
     Rend True si le joueur peut tirer

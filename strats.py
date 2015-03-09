@@ -394,7 +394,6 @@ class Intercepteur(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
-        print test.distallballon()
         dist = state.ball.position - player.position
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         butx = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x

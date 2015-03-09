@@ -9,7 +9,7 @@ from soccersimulator import PygletObserver
 from soccersimulator import SoccerBattle
 from monequipe import teams
 
-team1=teams[2] # rouge
+team1=teams[0] # rouge
 team2 = teams[1]
 '''
 if len(teams)>1:

@@ -93,7 +93,11 @@ class Degagement(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-        tir = Vector2D.create_polar(player.angle + 2.5, 100)
+        test = Outils(state, teamid, player)
+        if(test.canshoot):
+            tir = Vector2D.create_polar(player.angle + 2.5, 100)
+        else:
+            tir = Vector2D(0,0)
         return SoccerAction(Vector2D(0,0), tir)
     def create_strategy(self):
         return Degagement()
@@ -111,9 +115,13 @@ class Dribble(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
-            dri = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        dri = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        test = Outils(state, teamid, player)
+        if(test.canshoot):
             drib = Vector2D.create_polar(dri.angle + random.random()*2-1,1)
-            return SoccerAction(Vector2D(0,0), drib)
+        else:
+            drib = Vector2D(0,0)
+        return SoccerAction(Vector2D(0,0), drib)
     def create_strategy(self):
         return Dribble()
         
@@ -133,6 +141,7 @@ class Tirv(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
         tir = Vector2D(0,0)
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         if(self.random >= 1):
@@ -141,8 +150,10 @@ class Tirv(SoccerStrategy):
         if(self.random < 1):
             tir.x = tir.x + (GAME_GOAL_HEIGHT / 2)*0.80
             tir.y = tir.y + (GAME_GOAL_HEIGHT / 2)*0.80
-            
-        return SoccerAction(Vector2D(0,0), tir)
+        if(test.canshoot):
+            return SoccerAction(Vector2D(0,0), tir)
+        else:
+            return SoccerAction(Vector2D(0,0),Vector2D(0,0))
     def create_strategy(self):
         return Tirv()
 
@@ -161,8 +172,12 @@ class Tir(SoccerStrategy):
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
-        return SoccerAction(Vector2D(0,0), tir)
+        if(test.canshoot):
+            return SoccerAction(Vector2D(0,0), tir)
+        else:
+            return SoccerAction(Vector2D(0,0),Vector2D(0,0))
     def create_strategy(self):
         return Tir()
    
@@ -650,5 +665,14 @@ class Outils(SoccerState):
         else:
             return False
         
+    '''
+    Rend True si le joueur peut tirer
+    '''
+    def canshoot(self):
+        dist = state.ball.position - player.position
+        if(dist < PLAYER_RADIUS + BALL_RADIUS):
+            return True
+        else:
+            return False
         
                     

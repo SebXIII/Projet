@@ -540,7 +540,7 @@ class Follow(SoccerStrategy):
     def __init__(self):
         self.but = CompoStrat(AllerVersBallon(), Tirv())
         self.esquive = CompoStrat(AllerVersBallon(), Esquive())
-        self.suivre = CompoStrat(Suivre(), Esquive())
+        self.suivre = CompoStrat(Suivre(), Degagement())
     def start_battle(self,state):
         pass
     def begin_battles(self, state,count,max_step):

@@ -22,8 +22,8 @@ team0.add_player(SoccerPlayer("Bot 2",Defonceur()))
 team0.add_player(SoccerPlayer("Bot 1",Fonceur()))
 
 team5=SoccerTeam("Unicorn of Love 4v4")
-team5.add_player(SoccerPlayer("Vizicsacsi",fonceur()))
-team5.add_player(SoccerPlayer("Kikis",fonceur()))
+team5.add_player(SoccerPlayer("Vizicsacsi",Fonceur()))
+team5.add_player(SoccerPlayer("Kikis",Fonceur()))
 team5.add_player(SoccerPlayer("PowerOfEvil",Defenseur()))
 team5.add_player(SoccerPlayer("Vardags",TeamIntercepteur()))
 

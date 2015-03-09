@@ -760,7 +760,7 @@ class Outils(SoccerState):
     '''
     def canshoot(self):
         dist = self.state.ball.position - self.player.position
-        if(dist.norm < PLAYER_RADIUS + BALL_RADIUS):
+        if(dist.norm <= PLAYER_RADIUS + BALL_RADIUS):
             return True
         else:
             return False

@@ -34,4 +34,4 @@ team5.add_player(SoccerPlayer("Kikis",Fonceur()))
 team5.add_player(SoccerPlayer("PowerOfEvil",Defenseur()))
 team5.add_player(SoccerPlayer("Vardags",TeamIntercepteur()))
 
-teams =[team1, team3, team4, team5, team0, team9]
+teams =[team1, team3, team4, team5]

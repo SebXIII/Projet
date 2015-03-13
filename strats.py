@@ -137,17 +137,17 @@ class Tirv(SoccerStrategy):
     def start_battle(self,state):
         pass
     def begin_battles(self,state,count,max_step):
-        self.random = random.random() * 2
+        pass
     def finish_battle(self,won):
         pass
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
         tir = Vector2D(0,0)
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
-        if(self.random >= 1):
+        if(test.goalsupmid()):
             tir.x = tir.x - (GAME_GOAL_HEIGHT / 2) * 0.75
             tir.y = tir.y - (GAME_GOAL_HEIGHT / 2)*0.75
-        if(self.random < 1):
+        else:
             tir.x = tir.x + (GAME_GOAL_HEIGHT / 2)*0.75
             tir.y = tir.y + (GAME_GOAL_HEIGHT / 2)*0.75
         if(test.canshoot()):
@@ -398,7 +398,7 @@ class Intercepteur(SoccerStrategy):
         but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
         butx = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
         if(test.nbadvbalbut(True) == 1 and self.attente >= 1):
-            self.attente = self.attente - 1            
+            self.attente = self.attente - 1                
             return self.inter.compute_strategy(state, player, teamid)
         if((test.nbadvbalbut(True) == 1 or self.attente < 1) and abs(butx) > 15):
             return self.atck.compute_strategy(state, player, teamid)
@@ -577,8 +577,7 @@ class Outils(SoccerState):
     def __init__(self, state, team, player):
         self.team = team
         self.player = player
-        self.state = state
-        pass        
+        self.state = state       
     '''
     Donne la distance de l'adversaire le plus proche au ballon
     '''
@@ -661,7 +660,7 @@ class Outils(SoccerState):
                 if(distluibut.norm < distmebut.norm and distmelui.norm < dist):
                     dist = distmelui.norm
                     vec = p.position
-        return vec
+        return vec.copy()
         
     '''
     Donne la position du joueur allié le plus proche
@@ -687,7 +686,7 @@ class Outils(SoccerState):
                     if(distluibut.norm < distmebut.norm and distmelui.norm < dist):
                         dist = distmelui.norm
                         vec = p.position
-        return vec
+        return vec.copy()
         
     '''
     Rend la position du joueur adverse le plus proche du ballon
@@ -707,7 +706,7 @@ class Outils(SoccerState):
                 if(distlui.norm < dist):
                     dist = distlui.norm
                     vec = p.position
-        return vec
+        return vec.copy()
      
     
     '''
@@ -755,13 +754,45 @@ class Outils(SoccerState):
             return False
         
     '''
-    Rend True si le joueur peut tirer
+    Rend True si le joueur peut tirer (par défault moi)
     '''
-    def canshoot(self):
-        dist = self.state.ball.position - self.player.position
+    def canshoot(self, player=None):
+        if not player:
+            player = self.player
+        dist = self.state.ball.position - player.position
         if(dist.norm <= PLAYER_RADIUS + BALL_RADIUS):
             return True
         else:
             return False
         
-                    
+    '''
+    Rend la position du defenseur adverse le plus près des buts
+    '''
+    
+    def getgoaladv(self):
+        dist = 9999
+        vec = Vector2D(0,0)
+        if(self.team == 2):
+            for p in self.state.team1 :
+                distlui = self.state.get_goal_center(2)- p.position
+                if(distlui.norm < dist):
+                    dist = distlui.norm
+                    vec = p.position
+        else:
+            for p in self.state.team2 :
+                distlui = self.state.get_goal_center(1)- p.position
+                if(distlui.norm < dist):
+                    dist = distlui.norm
+                    vec = p.position
+        return vec.copy()
+        
+    '''
+    Rend True si le goal adverse est dans la partie supérieur du terrain
+    '''
+    def goalsupmid(self):
+        lesoutilsdelavie = Outils(self.state, self.team, self.player)
+        goal = lesoutilsdelavie.getgoaladv()
+        if(goal.y > 0.5 * GAME_HEIGHT):
+            True
+        else:
+            False

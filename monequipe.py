@@ -12,7 +12,7 @@ team4.add_player(SoccerPlayer("Steeelback",SurIntercepteur()))
 
 team3=SoccerTeam("SK 2v2")
 team3.add_player(SoccerPlayer("Fredy122",SurIntercepteur()))
-team3.add_player(SoccerPlayer("Fox",DefMove()))
+team3.add_player(SoccerPlayer("Fox",Defenseur()))
 
 team6=SoccerTeam("Versus Trying 2")
 team6.add_player(SoccerPlayer("Bot 1",Defonceur()))

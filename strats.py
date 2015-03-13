@@ -521,7 +521,7 @@ class Suivre(SoccerStrategy):
         pass
     def compute_strategy(self,state,player,teamid):
         outil = Outils(state, teamid, player)
-        loc1 = outil.jproall().copy()
+        loc1 = outil.moncopain().copy()
         loc2 = state.get_goal_center(teamid).copy()
         loc1.scale(0.9)
         loc2.scale(0.1)
@@ -552,12 +552,12 @@ class Follow(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         outil = Outils(state, teamid, player)
         allie = outil.jproall()
-        dist = state.ball.position - player.position
-        but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        dist = state.ball.position - player.position.copy()
+        but = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position.copy()
         dist2 = state.ball.position - allie
         if(not outil.equiperbal()):
-            but = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.x
-            if(abs(but) < 15):
+            but = state.get_goal_center(outils.IDTeamOp(teamid)).x - player.position.copy().x
+            if(abs(but) < 15 or outil.nbadvbalbut(True) < 1):
                 return self.but.compute_strategy(state, player, teamid)
             else:
                 return self.esquive.compute_strategy(state, player, teamid)
@@ -639,7 +639,7 @@ class Outils(SoccerState):
     
     
     '''
-    Donne la position du joueur adverse de moi
+    Donne la position du joueur adverse de moi des buts
     '''
     def jpro(self):
         dist = 9999
@@ -663,7 +663,7 @@ class Outils(SoccerState):
         return vec.copy()
         
     '''
-    Donne la position du joueur allié le plus proche
+    Donne la position du joueur allié le plus proche des buts
     '''
     def jproall(self):
         dist = 9999
@@ -793,6 +793,28 @@ class Outils(SoccerState):
         lesoutilsdelavie = Outils(self.state, self.team, self.player)
         goal = lesoutilsdelavie.getgoaladv()
         if(goal.y > 0.5 * GAME_HEIGHT):
-            True
+            return True
         else:
-            False
+            return False
+            
+    '''
+    Donne la position du joueur allié le plus proche de MOI
+    '''
+    def moncopain(self):
+        dist = 9999
+        vec = Vector2D(0,0)
+        if(self.team == 1):
+            for p in self.state.team1 :
+                if(p.position != self.player.position):
+                    distmelui = p.position - self.player.position
+                    if(distmelui.norm < dist):
+                        dist = distmelui.norm
+                        vec = p.position
+        else:
+            for p in self.state.team2 :
+                if(p.position != self.player.position):
+                    distmelui = p.position - self.player.position
+                    if(distmelui.norm < dist):
+                        dist = distmelui.norm
+                        vec = p.position
+        return vec.copy()

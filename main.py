@@ -10,7 +10,7 @@ from soccersimulator import SoccerBattle
 from monequipe import teams
 
 team1=teams[5] # rouge
-team2 = teams[4] #bleu
+team2 = teams[4] # bleu
 '''
 if len(teams)>1:
     team2=teams[1]

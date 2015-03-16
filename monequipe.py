@@ -1,7 +1,8 @@
 from soccersimulator import SoccerBattle, SoccerPlayer, SoccerTeam
-from soccersimulator import PygletObserver,ConsoleListener,LogListener
+from soccersimulator import PygletObserver,ConsoleListener,LogListener, InteractStrategy
 from soccersimulator import pyglet
-from strats import AllerVersBallon, Esquive, Follow, Attaquant, Tir, TeamIntercepteur, VideS, AllerVersLoc, CompoStrat, Fonceur, DefMove, AllerButBallon, Degagement, Defonceur, Defenseur, Dribble, Dribbleur, SurIntercepteur ,Interception, Intercepteur
+from strats import *
+
 
 team1=SoccerTeam("Team Solo Mid 1v1")
 team1.add_player(SoccerPlayer("Dyrus",Intercepteur()))
@@ -34,4 +35,14 @@ team5.add_player(SoccerPlayer("Kikis",Fonceur()))
 team5.add_player(SoccerPlayer("PowerOfEvil",Defenseur()))
 team5.add_player(SoccerPlayer("Vardags",TeamIntercepteur()))
 
-teams =[team1, team3, team4, team5]
+team9 = SoccerTeam("App")
+list_key_player1=['a','z', 'e', 'r', 't', 'y']
+list_strat_player1=[AppFonceur(),AppDefenseur(),AppSuivre(), AppInterception(), AppDribble(), AppPasse()]
+inter_strat_player1=InteractStrategy(list_key_player1,list_strat_player1,"tent3.2.pkl")
+team9.add_player(SoccerPlayer("Robot", inter_strat_player1))
+team9.add_player(SoccerPlayer("Robocop",TreeStrat()))
+
+team10 = SoccerTeam("Tree")
+team10.add_player(SoccerPlayer("Truc",Fonceur()))
+team10.add_player(SoccerPlayer("Robotbis",TreeStrat()))
+teams =[team1, team3, team4, team5, team9, team10]

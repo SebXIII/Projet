@@ -2,8 +2,11 @@
 from soccersimulator import Vector2D, SoccerBattle, SoccerPlayer, SoccerTeam, SoccerAction, SoccerStrategy, SoccerState
 from soccersimulator import PygletObserver,ConsoleListener,LogListener
 from soccersimulator import PLAYER_RADIUS, BALL_RADIUS, GAME_WIDTH, GAME_HEIGHT, GAME_GOAL_HEIGHT
+import apprentissage
 import outils
 import random
+import os
+import pickle
 import pdb
 
 '''
@@ -180,6 +183,30 @@ class Tir(SoccerStrategy):
             return SoccerAction(Vector2D(0,0),Vector2D(0,0))
     def create_strategy(self):
         return Tir()
+   
+'''
+Stratégie de passe
+Le joueur fait une passe
+'''   
+class Passe(SoccerStrategy):
+    def __init__(self):
+        pass
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
+        tir = test.moncopain() - player.position
+        if(test.canshoot()):
+            return SoccerAction(Vector2D(0,0), tir)
+        else:
+            return SoccerAction(Vector2D(0,0),Vector2D(0,0))
+    def create_strategy(self):
+        return Tir()
+
+   
+   
    
 """
 Fusionne deux starts, une de tir et une de mouvement
@@ -439,7 +466,7 @@ class SurIntercepteur(SoccerStrategy):
             return self.fonceur.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return SurIntercepteur()
-'''
+'''array
 Intercepteur 4v4
 '''     
 class TeamIntercepteur(SoccerStrategy):
@@ -565,6 +592,134 @@ class Follow(SoccerStrategy):
             return self.suivre.compute_strategy(state, player, teamid)
     def create_strategy(self):
         return Follow()
+        
+############################################################################################################################################################
+############################################################################################################################################################        
+############################################################################################################################################################ 
+#STRATEGIE APPRENTISSAGE
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+'''
+Stratégie apprentissage ; Subdivision des fonctions plus haut
+'''
+
+class AppFonceur(SoccerStrategy):
+    def __init__(self):
+        self.name = "fonceur"
+        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.fonceur.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.fonceur.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppFonceur()
+        
+class AppDefenseur(SoccerStrategy):
+    def __init__(self):
+        self.name = "defenseur"
+        self.defense = CompoStrat(AllerButBallon(), Degagement())
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.defense.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppDefenseur()
+
+class AppSuivre(SoccerStrategy):
+    def __init__(self):
+        self.name = "suivre"
+        self.suivre = CompoStrat(Suivre(), Degagement())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppSuivre()
+        
+class AppInterception(SoccerStrategy):
+    def __init__(self):
+        self.name = "intercepteur"
+        self.suivre = CompoStrat(Interception(), Tirv())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppInterception()
+        
+class AppDribble(SoccerStrategy):
+    def __init__(self):
+        self.name = "dribble"
+        self.suivre = CompoStrat(AllerVersBallon(), Esquive())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppDribble()
+
+class AppPasse(SoccerStrategy):
+    def __init__(self):
+        self.name = "passe"
+        self.suivre = CompoStrat(AllerVersBallon(), Passe())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppPasse()
+
+
+
+############################################################################################################################################################
+############################################################################################################################################################        
+############################################################################################################################################################ 
+#
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+class TreeStrategy(SoccerStrategy):
+    def __init__(self,name,gen_feat,fn_tree,dic_strat):
+        self.name=name
+        fn=os.path.join(os.path.dirname(os.path.realpath(__file__)),fn_tree)
+        self.tree=pickle.load(open(fn,"rb"))
+        self.gen_feat=gen_feat
+        self.dic_strat=dic_strat
+    def compute_strategy(self,state,player,teamid):
+        strat = self.tree.predict(self.gen_feat(state,teamid,player.id))[0]
+        return self.dic_strat[strat].compute_strategy(state,player,teamid)
+
+class TreeStrat(TreeStrategy):
+    def __init__(self):
+        dic_strat_first=dict({"fonceur":AppFonceur(),"defenseur":AppDefenseur(),\
+            "suivre":AppSuivre(),"intercepteur":AppInterception(),"dribble":AppDribble(),"passe":AppPasse()})
+        super(TreeStrat,self).__init__("My First Tree",apprentissage.gen_feature_simple,"first_tree.pkl",dic_strat_first)
+
+                
 
 ############################################################################################################################################################
 ############################################################################################################################################################        
@@ -639,7 +794,7 @@ class Outils(SoccerState):
     
     
     '''
-    Donne la position du joueur adverse de moi des buts
+    Donne la position du joueur adverse le plus proche de moi et entre moi et mes buts
     '''
     def jpro(self):
         dist = 9999
@@ -696,13 +851,13 @@ class Outils(SoccerState):
         vec = Vector2D(0,0)
         if(self.team == 2):
             for p in self.state.team1 :
-                distlui = state.ball.position - p.position
+                distlui = self.state.ball.position - p.position
                 if(distlui.norm < dist):
                     dist = distlui.norm
                     vec = p.position
         else:
             for p in self.state.team2 :
-                distlui = state.ball.position - p.position
+                distlui = self.state.ball.position - p.position
                 if(distlui.norm < dist):
                     dist = distlui.norm
                     vec = p.position
@@ -818,3 +973,28 @@ class Outils(SoccerState):
                         dist = distmelui.norm
                         vec = p.position
         return vec.copy()
+        
+    '''
+    Rend ma distance au ballon
+    '''
+    def distball(self):
+        return self.state.ball.position - self.player.position
+        
+    '''
+    Rend True si je suis de mon côté du terrain
+    '''
+    
+    def demoncote(self):
+        vec = self.state.get_goal_center(self.team) - self.player.position
+        return (vec.norm < GAME_WIDTH / 2)
+    '''
+    Rend True si la balle est de mon côté
+    '''
+    def ballmoncote(self):
+        vec = self.state.get_goal_center(self.team) - self.state.ball.position
+        return (vec.norm < GAME_WIDTH / 2)
+    
+    '''
+    Rend True si je suis dans la moitié superieure du terrain
+    '''
+######################################################################################################

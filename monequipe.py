@@ -70,4 +70,4 @@ team_tree.add_player(SoccerPlayer("Robot DEF", TreeST2))
 
 
 
-teams =[team1, team_tree, team4, team5]
+teams =[team_tree, team1, team4, team5]

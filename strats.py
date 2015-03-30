@@ -177,6 +177,7 @@ class Tir(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
         tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        tir.norm = tir.norm * 0.3
         if(test.canshoot()):
             return SoccerAction(Vector2D(0,0), tir)
         else:
@@ -198,6 +199,7 @@ class Passe(SoccerStrategy):
     def compute_strategy(self,state,player,teamid):
         test = Outils(state, teamid, player)
         tir = test.moncopain() - player.position
+        tir.norm = tir.norm * 2
         if(test.canshoot()):
             return SoccerAction(Vector2D(0,0), tir)
         else:
@@ -592,6 +594,58 @@ class Follow(SoccerStrategy):
             return self.suivre.compute_strategy(state, player, teamid)
     def create_strategy(self):
         return Follow()
+     
+'''
+Stratégie de placement
+Se place de façon optimal pour attendre une passe
+'''
+class Anticipation(SoccerStrategy):
+    def __init__(self):       
+        pass
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        outil = Outils(state, teamid, player)
+        loc1 = outil.moncopain().copy()
+        if(outil.hautterrain() and teamid == 1):
+            mouvement = loc1 + Vector2D(15,-15) - player.position
+        elif(outil.hautterrain() and teamid == 2):
+            mouvement = loc1 + Vector2D(-15,-15) - player.position
+        elif(not outil.hautterrain() and teamid == 1):
+            mouvement = loc1 + Vector2D(15,15) - player.position
+        else:
+            mouvement = loc1 + Vector2D(-15,15) - player.position
+        return SoccerAction(mouvement, Vector2D(0,0))
+    def create_strategy(self):
+        return Anticipation()
+        
+'''
+Stratégie de placement
+Se place de façon optimal pour attendre une passe
+'''
+class Contourne(SoccerStrategy):
+    def __init__(self):       
+        pass
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        outil = Outils(state, teamid, player)
+        loc1 = outil.moncopain().copy()
+        if(outil.hautterrain()):
+            mouvement = state.get_goal_center(outils.IDTeamOp(teamid)) + Vector2D(0,14) - player.position
+        else:
+            mouvement = state.get_goal_center(outils.IDTeamOp(teamid)) + Vector2D(0,-14) - player.position
+        mouvement.norm = mouvement.norm * 0.4
+        if(outil.canshoot()):
+            return SoccerAction(Vector2D(0,0), mouvement)
+        else:
+            return SoccerAction(Vector2D(0,0), Vector2D(0,0))
+    def create_strategy(self):
+        return Contourne()
         
 ############################################################################################################################################################
 ############################################################################################################################################################        
@@ -647,36 +701,6 @@ class AppSuivre(SoccerStrategy):
         return self.suivre.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return AppSuivre()
-        
-class AppInterception(SoccerStrategy):
-    def __init__(self):
-        self.name = "intercepteur"
-        self.suivre = CompoStrat(Interception(), Tirv())
-    def start_battle(self,state):
-        pass
-    def begin_battles(self,state,count,max_step):
-        self.suivre.begin_battles(state, count, max_step)
-    def finish_battle(self,won):
-        pass
-    def compute_strategy(self,state,player,teamid):
-        return self.suivre.compute_strategy(state,player,teamid)
-    def create_strategy(self):
-        return AppInterception()
-        
-class AppDribble(SoccerStrategy):
-    def __init__(self):
-        self.name = "dribble"
-        self.suivre = CompoStrat(AllerVersBallon(), Esquive())
-    def start_battle(self,state):
-        pass
-    def begin_battles(self,state,count,max_step):
-        self.suivre.begin_battles(state, count, max_step)
-    def finish_battle(self,won):
-        pass
-    def compute_strategy(self,state,player,teamid):
-        return self.suivre.compute_strategy(state,player,teamid)
-    def create_strategy(self):
-        return AppDribble()
 
 class AppPasse(SoccerStrategy):
     def __init__(self):
@@ -694,32 +718,69 @@ class AppPasse(SoccerStrategy):
         return AppPasse()
 
 
-
-############################################################################################################################################################
-############################################################################################################################################################        
-############################################################################################################################################################ 
-#
-############################################################################################################################################################
-############################################################################################################################################################
-############################################################################################################################################################
-class TreeStrategy(SoccerStrategy):
-    def __init__(self,name,gen_feat,fn_tree,dic_strat):
-        self.name=name
-        fn=os.path.join(os.path.dirname(os.path.realpath(__file__)),fn_tree)
-        self.tree=pickle.load(open(fn,"rb"))
-        self.gen_feat=gen_feat
-        self.dic_strat=dic_strat
-    def compute_strategy(self,state,player,teamid):
-        strat = self.tree.predict(self.gen_feat(state,teamid,player.id))[0]
-        return self.dic_strat[strat].compute_strategy(state,player,teamid)
-
-class TreeStrat(TreeStrategy):
+class AppAttente(SoccerStrategy):
     def __init__(self):
-        dic_strat_first=dict({"fonceur":AppFonceur(),"defenseur":AppDefenseur(),\
-            "suivre":AppSuivre(),"intercepteur":AppInterception(),"dribble":AppDribble(),"passe":AppPasse()})
-        super(TreeStrat,self).__init__("My First Tree",apprentissage.gen_feature_simple,"first_tree.pkl",dic_strat_first)
+        self.name = "attente"
+        self.suivre = CompoStrat(Anticipation(), Tir())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppPasse()
+        
+        
+class AppContourne(SoccerStrategy):
+    def __init__(self):
+        self.name = "contourne"
+        self.suivre = CompoStrat(AllerVersBallon(), Contourne())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppContourne()
 
-                
+
+class AppDegagement(SoccerStrategy):
+    def __init__(self):
+        self.name = "degagement"
+        self.suivre = CompoStrat(AllerVersBallon(), Degagement())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppDegagement()
+        
+class AppFrappe(SoccerStrategy):
+    def __init__(self):
+        self.name = "frappe"
+        self.suivre = CompoStrat(AllerVersBallon(), Tirv())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.suivre.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.suivre.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppDegagement()
+        
+
 
 ############################################################################################################################################################
 ############################################################################################################################################################        
@@ -862,6 +923,28 @@ class Outils(SoccerState):
                     dist = distlui.norm
                     vec = p.position
         return vec.copy()
+        
+    '''
+    Rend la position du joueur allié le plus proche du ballon
+    '''
+    def jballall(self):
+        dist = 9999
+        vec = Vector2D(0,0)
+        if(self.team == 1):
+            for p in self.state.team1 :
+                if(self.player.id != p.id):
+                    distlui = self.state.ball.position - p.position
+                    if(distlui.norm < dist):
+                        dist = distlui.norm
+                        vec = p.position
+        else:
+            for p in self.state.team2 :
+                if(self.player.id != p.id):
+                    distlui = self.state.ball.position - p.position
+                    if(distlui.norm < dist):
+                        dist = distlui.norm
+                        vec = p.position
+        return vec.copy()
      
     
     '''
@@ -986,15 +1069,58 @@ class Outils(SoccerState):
     
     def demoncote(self):
         vec = self.state.get_goal_center(self.team) - self.player.position
-        return (vec.norm < GAME_WIDTH / 2)
+        return (vec.x < GAME_WIDTH / 2)
     '''
     Rend True si la balle est de mon côté
     '''
     def ballmoncote(self):
         vec = self.state.get_goal_center(self.team) - self.state.ball.position
-        return (vec.norm < GAME_WIDTH / 2)
+        return (vec.x < GAME_WIDTH / 2)
     
     '''
     Rend True si je suis dans la moitié superieure du terrain
     '''
+    
+    def hautterrain(self):
+        vec = self.player.position
+        return (vec.y > GAME_HEIGHT / 2)
+    
+    '''
+    Rend 1, 2, 3 ou 4 en fonction de quel quart je (ou player) suis par rapport à mon but
+    '''
+    def quart(self, playerpos = None):
+        if(playerpos is None):
+            playerpos = self.player.position
+        vec = self.state.get_goal_center(self.team) - playerpos
+        quart = vec.x / GAME_WIDTH
+        if(abs(quart) < 0.25):
+            return 1
+        elif(abs(quart) < 0.5):
+            return 2
+        elif(abs(quart) < 0.75):
+            return 3
+        else:
+            return 4
+            
+    '''
+    Rend le quart (longueur) du terrain joueur adverse le plus menaçant
+    '''
+    def quartadv(self):
+        return self.quart(self.jpro())
+        
+    '''
+    Rend le tier (hauteur) du terrain dans lequel ce trouve l'adversaire le plus menaçant (ou un autre joueur si défini)
+    '''
+    def tieradv(self, playerpos = None):
+        if(player is None):        
+            playerpos = jpro().position
+        tier = playerpos.y / GAME_HEIGHT
+        if(abs(tier) < 0.33):
+            return 1
+        elif(abs(tier) < 0.66):
+            return 2
+        else:
+            return 3
+            
+    
 ######################################################################################################

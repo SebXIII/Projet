@@ -1169,7 +1169,7 @@ class Outils(SoccerState):
 ######################################################################################################
 
 class Hero(SoccerStrategy):
-    def __init__(self):
+    def __init__(self, player):
         self.adv = player
         self.strat = AllerVersLoc(Vector2D())
         self.defen = CompoStrat(AllerVersBallon(), Degagement())

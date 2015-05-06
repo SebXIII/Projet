@@ -3,6 +3,15 @@ from soccersimulator import *
 from strats import *
 from apprentissage import gen_feature_simple
 
+team666=SoccerTeam("Satan")
+team666.add_player(SoccerPlayer("Satan",Hero()))
+
+team999=SoccerTeam("Naja testeur")
+team999.add_player(SoccerPlayer("Naja",Fonceur()))
+
+
+
+
 team1=SoccerTeam("Team Solo Mid 1v1")
 team1.add_player(SoccerPlayer("Dyrus",Intercepteur()))
 
@@ -37,14 +46,18 @@ team5.add_player(SoccerPlayer("PowerOfEvil",Defenseur()))
 team5.add_player(SoccerPlayer("Vardags",TeamIntercepteur()))
 
 team9 = SoccerTeam("App")
-list_key_player1=['a','z', 'e', 'r', 't', 'y', 'u', 'i']
+list_key_player1=['a','z', 'e', 'r',]
+#Ancienne liste de nom
 list_strat=[AppFonceur(),AppDefenseur(),AppSuivre(), AppPasse(), AppAttente(), AppContourne(), AppDegagement(), AppFrappe()]
 list_nom=["fonceur", "defenseur", "suivre", "passe", "attente", "contourne", "degagement", "frappe"]
+#Nouvelle liste de nom
+list_strat2=[AppAttaque(),AppDefenseur(), AppAttente(), AppInterception()]
+list_nom2=["fonceur", "defenseur", "attente", "interception"]
 
-list_strat_player1=list(list_strat)
-inter_strat_player1=InteractStrategy(list_key_player1,list_strat_player1,"IAdef1.pkl")
-team9.add_player(SoccerPlayer("Bot DEF", inter_strat_player1))
-team9.add_player(SoccerPlayer("Co Fonceur",Fonceur()))
+list_strat_player1=list(list_strat2)
+inter_strat_player1=InteractStrategy(list_key_player1,list_strat_player1,"IAatk33.pkl")
+team9.add_player(SoccerPlayer("Bot ATK", inter_strat_player1))
+team9.add_player(SoccerPlayer("Co Fonceur",Defenseur()))
 
 '''
 list_key_player2=['q', 's', 'd', 'f', 'g', 'h', 'j', 'k']
@@ -70,4 +83,4 @@ team_tree.add_player(SoccerPlayer("Robot DEF", TreeST2))
 
 
 
-teams =[team_tree, team1, team4, team5]
+teams =[team666, team999, team9, team3, team4, team5]

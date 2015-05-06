@@ -686,6 +686,19 @@ class AppDefenseur(SoccerStrategy):
         return self.defense.compute_strategy(state,player,teamid)
     def create_strategy(self):
         return AppDefenseur()
+        
+class AppInterception(SoccerStrategy):
+    def __init__(self):
+        self.name = "interception"
+        self.defense = CompoStrat(Interception(), Degagement())
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        return self.defense.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppInterception()
 
 class AppSuivre(SoccerStrategy):
     def __init__(self):
@@ -780,6 +793,34 @@ class AppFrappe(SoccerStrategy):
     def create_strategy(self):
         return AppDegagement()
         
+        
+class AppAttaque(SoccerStrategy):
+    def __init__(self):
+        self.name = "attaque"
+        self.fonceur = CompoStrat(AllerVersBallon(), Tir())
+        self.contourne = CompoStrat(AllerVersBallon(), Contourne())
+        self.frappe = CompoStrat(AllerVersBallon(), Tirv())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.fonceur.begin_battles(state, count, max_step)
+        self.contourne.begin_battles(state, count, max_step)
+        self.frappe.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        out = Outils(state, teamid, player)
+        moibut = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        if(moibut.x < GAME_WIDTH * 0.1):
+            return self.frappe.compute_strategy(state,player,teamid)
+        elif(out.nbadvbalbut() == 0):
+            return self.fonceur.compute_strategy(state,player,teamid)
+        else:
+            return self.contourne.compute_strategy(state,player,teamid)
+        return self.fonceur.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AppAttaque()
+        
 
 
 ############################################################################################################################################################
@@ -829,7 +870,7 @@ class Outils(SoccerState):
     '''
     Donne le nombre d'adversaire entre la balle et le but (ou le nombre d'allié si adv false)
     '''
-    def nbadvbalbut(self, adv):
+    def nbadvbalbut(self, adv=True):
         nb = 0
         if((self.team == 2 and adv) or (self.team == 1 and not adv)):
             for p in self.state.team1 :
@@ -1124,3 +1165,28 @@ class Outils(SoccerState):
             
     
 ######################################################################################################
+#TME
+######################################################################################################
+
+class Hero(SoccerStrategy):
+    def __init__(self):
+        self.adv = player
+        self.strat = AllerVersLoc(Vector2D())
+        self.defen = CompoStrat(AllerVersBallon(), Degagement())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.attente = random.random() * 100 + 150
+        self.defen.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
+        distball = self.adv.position - state.ball.position
+        if(distball < GAME_WIDTH * 0.1): #on considère qu'il a le ballon
+            self.strat.loc = self.adv.position
+            return self.strat.compute_strategy(state,player,teamid)        
+        else:
+            return self.defen.compute_strategy(state, player, teamid)
+    def create_strategy(self):
+        return Hero()

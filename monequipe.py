@@ -60,7 +60,7 @@ list_strat2=[AppAttaque(),AppDefenseur(), AppAttente(), AppInterception()]
 list_nom2=["fonceur", "defenseur", "attente", "interception"]
 
 list_strat_player1=list(list_strat2)
-inter_strat_player1=InteractStrategy(list_key_player1,list_strat_player1,"IAatk33.pkl")
+inter_strat_player1=InteractStrategy(list_key_player1,list_strat_player1,"songicefire.pkl")
 team9.add_player(SoccerPlayer("Bot ATK", inter_strat_player1))
 team9.add_player(SoccerPlayer("Co Fonceur",Defenseur()))
 
@@ -75,17 +75,17 @@ team9.add_player(SoccerPlayer("Bot DEF",inter_strat_player2))
 team_tree = SoccerTeam("Team Tree")
 treeia=TreeIA(gen_feature_simple,dict(zip(list_nom,list_strat)))
 
-fn=os.path.join(os.path.dirname(os.path.realpath(__file__)),"arbrebotatk1.pkl")
+fn=os.path.join(os.path.dirname(os.path.realpath(__file__)),"arbresongicefire.pkl")
 treeia.load(fn)
 TreeST=TreeStrategy("IA atk",treeia)
 
-treeia2=TreeIA(gen_feature_simple,dict(zip(list_nom,list_strat)))
+'''treeia2=TreeIA(gen_feature_simple,dict(zip(list_nom,list_strat)))
 fn=os.path.join(os.path.dirname(os.path.realpath(__file__)),"arbrebotdef1.pkl")
 treeia2.load(fn)
-TreeST2=TreeStrategy("IA def",treeia2)
-team_tree.add_player(SoccerPlayer("Robot ATK", TreeST))
-team_tree.add_player(SoccerPlayer("Robot DEF", TreeST2))
+TreeST2=TreeStrategy("IA def",treeia2)'''
+team_tree.add_player(SoccerPlayer("Robot de la boue", TreeST))
+'''team_tree.add_player(SoccerPlayer("Robot DEF", TreeST2))'''
+team_tree.add_player(SoccerPlayer("Co Fonceur",Defenseur()))
 
 
-
-teams =[team9, team3, team4, team666, team5]
+teams =[team9, team3, team4, team666, team_tree, team5]

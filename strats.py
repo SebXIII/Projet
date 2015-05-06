@@ -2,7 +2,7 @@
 from soccersimulator import Vector2D, SoccerBattle, SoccerPlayer, SoccerTeam, SoccerAction, SoccerStrategy, SoccerState
 from soccersimulator import PygletObserver,ConsoleListener,LogListener
 from soccersimulator import PLAYER_RADIUS, BALL_RADIUS, GAME_WIDTH, GAME_HEIGHT, GAME_GOAL_HEIGHT
-import apprentissage
+#import apprentissage
 import outils
 import random
 import os
@@ -1207,7 +1207,28 @@ class Outils(SoccerState):
             if((p.type == "mud") and (bt.x < zone.x) and (bt.y < zone.y) and (bt.x + d.x > zone.x) and (bt.y + d.y > zone.y)):
                 return True
             return False
-                
+            
+    '''
+    Je suis dans la boue ?
+    '''
+    def inmud(self):
+        for p in self.state.danger_zones :
+            d = p.diagonal
+            bt = p.bottom_left
+            if((p.type == "mud") and (bt.x < self.player.position.x) and (bt.y < self.player.position.y) and (bt.x + d.x > self.player.position.x) and (bt.y + d.y > self.player.position.y)):
+                return True
+        return False
+        
+    '''
+    Je suis dans la glace ?
+    '''
+    def inice(self):
+        for p in self.state.danger_zones :
+            d = p.diagonal
+            bt = p.bottom_left
+            if((p.type == "ice") and (bt.x < self.player.position.x) and (bt.y < self.player.position.y) and (bt.x + d.x > self.player.position.x) and (bt.y + d.y > self.player.position.y)):
+                return True
+        return False     
                 
             
     
@@ -1322,7 +1343,7 @@ class Smartshoot(SoccerStrategy):
             return SoccerAction(Vector2D(0,0),Vector2D(0,0))
     def create_strategy(self):
         return Smartshoot()
-        
+     
 class Fonceurdelaboue(SoccerStrategy):
     def __init__(self):
         self.fonceur = CompoStrat(AllerVersBallon(), Tirv())

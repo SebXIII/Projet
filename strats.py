@@ -1163,6 +1163,53 @@ class Outils(SoccerState):
         else:
             return 3
             
+    '''
+    La balle est dans la boue ?
+    '''
+    def ballinmud(self):
+        for p in self.state.danger_zones :
+            d = p.diagonal
+            bt = p.bottom_left
+            if((p.type == "mud") and (bt.x < self.state.ball.position.x) and (bt.y < self.state.ball.position.y) and (bt.x + d.x > self.state.ball.position.x) and (bt.y + d.y > self.state.ball.position.y)):
+                return True
+            else:
+                return False
+                        
+    '''
+    La balle est dans la glace ?
+    '''
+    def ballinice(self):
+        for p in self.state.danger_zones :
+            d = p.diagonal
+            bt = p.bottom_left
+            if((p.type == "ice") and (bt.x < self.state.ball.position.x) and (bt.y < self.state.ball.position.y) and (bt.x + d.x > self.state.ball.position.x) and (bt.y + d.y > self.state.ball.position.y)):
+                return True
+        return False
+                
+    '''
+    Le point est dans la glace
+    '''
+    def zoneinice(self, zone):
+        for p in self.state.danger_zones :
+            d = p.diagonal
+            bt = p.bottom_left
+            if((p.type == "ice") and (bt.x < zone.x) and (bt.y < zone.y) and (bt.x + d.x > zone.x) and (bt.y + d.y > zone.y)):
+                return True
+            return False
+        
+    '''
+    Le point est dans la glace
+    '''
+    def zoneinmud(self, zone):
+        for p in self.state.danger_zones :
+            d = p.diagonal
+            bt = p.bottom_left
+            if((p.type == "mud") and (bt.x < zone.x) and (bt.y < zone.y) and (bt.x + d.x > zone.x) and (bt.y + d.y > zone.y)):
+                return True
+            return False
+                
+                
+            
     
 ######################################################################################################
 #TME
@@ -1190,3 +1237,113 @@ class Hero(SoccerStrategy):
             return self.defen.compute_strategy(state, player, teamid)
     def create_strategy(self):
         return Hero()
+        
+        
+
+"""
+Stratégie fonceurdelaboue
+Un fonceur qui s'adapte aux pièges
+
+BUT :
+-Eviter boue quand la balle n'est pas dedant
+-Aller lentement sur la glace
+
+SI BALL BOUE -> Fonceur (on est obligé d'aller dans le tas)
+SINON
+SI BALL GLACE ET LUI AUSSI -> Fonceur lent (minimiser les dégâts)
+SINON
+SI BALL GLACE ET PAS LUI -> Fonceur (je suis pas encore dans la glace)
+SINON
+JAI LE BALLON -> Fonceur evitant boue et glace
+JAI PAS LE BALON -> Fonceur (je suis le mec qui a la balle)
+"""
+
+        
+'''
+Stratégie de mouvement
+Se déplace vers un point indiqué lentement
+'''
+class AllerLentementVersLoc(SoccerStrategy):
+    def __init__(self, localisation):
+        self.loc = localisation        
+        pass
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        mouvement = self.loc - player.position
+        mouvement.product(0.1)
+        return SoccerAction(mouvement, Vector2D(0,0))
+    def create_strategy(self):
+        return AllerLentementVersLoc()
+        
+        
+'''
+Stratégie de mouvement
+Le joueur se déplacera vers le point indiqué lentement
+'''
+
+class AllerLentementVersBallon(SoccerStrategy):
+    def __init__(self):
+        self.strat= AllerLentementVersLoc(Vector2D())
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        self.strat.loc= state.ball.position + state.ball.speed
+        return self.strat.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return AllerLentementVersBallon()
+        
+'''
+Stratégie de tir
+Le joueur tirera vers les buts, sauf si cela envoie la balle vers une zone de boue
+'''
+class Smartshoot(SoccerStrategy):
+    def __init__(self):
+        pass
+    def start_battle(self,state):
+        pass
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
+        tir = state.get_goal_center(outils.IDTeamOp(teamid)) - player.position
+        tir.norm = tir.norm * 0.3
+        if(test.canshoot()):
+            if(test.zoneinmud(player.position + tir) or test.zoneinice(player.position + tir)):
+                tir.x = tir.x - GAME_HEIGHT * 0.33
+                return SoccerAction(Vector2D(0,0), tir)
+            else:
+                return SoccerAction(Vector2D(0,0), tir)
+        else:
+            return SoccerAction(Vector2D(0,0),Vector2D(0,0))
+    def create_strategy(self):
+        return Smartshoot()
+        
+class Fonceurdelaboue(SoccerStrategy):
+    def __init__(self):
+        self.fonceur = CompoStrat(AllerVersBallon(), Tirv())
+        self.fonceurlent = CompoStrat(AllerLentementVersBallon(), Tirv())
+        self.fonceurmalin = CompoStrat(AllerVersBallon(), Smartshoot())
+    def start_battle(self,state):
+        pass
+    def begin_battles(self,state,count,max_step):
+        self.fonceur.begin_battles(state, count, max_step)
+    def finish_battle(self,won):
+        pass
+    def compute_strategy(self,state,player,teamid):
+        test = Outils(state, teamid, player)
+        if(test.ballinmud()):
+            return self.fonceur.compute_strategy(state,player,teamid)
+        if(test.ballinice() and test.zoneinice(player.position)):
+            return self.fonceurlent.compute_strategy(state,player,teamid)
+        if(test.ballinice()):
+            return self.fonceur.compute_strategy(state,player,teamid)
+        if(test.distball() < GAME_WIDTH * 0.1):
+            return self.fonceurmalin.compute_strategy(state,player,teamid)
+        return self.fonceur.compute_strategy(state,player,teamid)
+    def create_strategy(self):
+        return Fonceurdelaboue()

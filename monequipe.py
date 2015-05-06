@@ -3,8 +3,8 @@ from soccersimulator import *
 from strats import *
 from apprentissage import gen_feature_simple
 
-team666=SoccerTeam("Satan")
-team666.add_player(SoccerPlayer("Satan",Hero()))
+#team666=SoccerTeam("Satan")
+#team666.add_player(SoccerPlayer("Satan",Hero()))
 
 team999=SoccerTeam("Naja testeur")
 team999.add_player(SoccerPlayer("Naja",Fonceur()))
@@ -17,6 +17,11 @@ team1.add_player(SoccerPlayer("Dyrus",Intercepteur()))
 
 #team7=SoccerTeam("Cloud 9 1v1")
 #team7.add_player(SoccerPlayer("Hai", Follow()))
+
+team666=SoccerTeam("SATAN NAJA")
+team666.add_player(SoccerPlayer("Satan",Fonceurdelaboue()))
+team666.add_player(SoccerPlayer("Naja",SurIntercepteur()))
+
 
 team4=SoccerTeam("Fnatic 2v2")
 team4.add_player(SoccerPlayer("Reignover",Follow()))
@@ -83,4 +88,4 @@ team_tree.add_player(SoccerPlayer("Robot DEF", TreeST2))
 
 
 
-teams =[team9, team3, team4, team5]
+teams =[team9, team3, team4, team666, team5]
